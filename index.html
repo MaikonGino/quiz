@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Computação em Nuvem II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* overflow: hidden; foi removido para evitar problemas de rolagem em telas pequenas com conteúdo grande */
+        }
+        .quiz-option, .level-button, .history-button, .action-button, .tab-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .quiz-option:hover:not(:disabled), .level-button:hover, .history-button:hover, .action-button:hover:not(:disabled), .tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        /* -- CORREÇÃO: Feedback tátil para mobile -- */
+        .quiz-option:active, .level-button:active, .history-button:active, .action-button:active:not(:disabled), .tab-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .quiz-option.selected {
+            border-color: #38bdf8; /* sky-400 */
+            background-color: #e0f2fe; /* sky-100 */
+            color: #0369a1; /* sky-700 */
+        }
+        .dark .quiz-option.selected {
+            background-color: #0c4a6e; /* sky-900 */
+            color: #e0f2fe; /* sky-100 */
+        }
+        .correct {
+            background-color: #22c55e !important; color: white !important; border-color: #16a34a !important;
+        }
+        .incorrect {
+            background-color: #ef4444 !important; color: white !important; border-color: #dc2626 !important;
+        }
+        .tab-button.active {
+            border-color: #0ea5e9; /* sky-500 */
+            background-color: #0ea5e9;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        /* Animações */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.5s ease-in-out; }
+
+        @keyframes fall {
+            0% { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: fall 3s linear forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex items-center justify-center min-h-screen p-4">
+
+    <div id="animation-overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none z-50"></div>
+
+    <div id="quiz-container" class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 relative z-10">
+        
+        <div id="start-screen" class="text-center">
+             <h1 class="text-3xl md:text-4xl font-bold text-sky-600 dark:text-sky-400 mb-4">Computação em Nuvem II ☁️</h1>
+            <p class="text-slate-600 dark:text-slate-400 mb-8 text-lg">Selecione o nível de dificuldade para começar ou veja seu histórico.</p>
+            <div class="grid grid-cols-1 gap-4 mb-6">
+                <button onclick="startGame('medium')" class="level-button w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 dark:focus-visible:ring-offset-slate-900">Nível Médio</button>
+                <button onclick="startGame('hard')" class="level-button w-full bg-amber-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-600 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 dark:focus-visible:ring-offset-slate-900">Nível Difícil</button>
+                <button onclick="startGame('university')" class="level-button w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 dark:focus-visible:ring-offset-slate-900">Hard (Universitário)</button>
+            </div>
+            <button onclick="showHistoryScreen()" class="history-button w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-900">Ver Histórico de Estudos</button>
+        </div>
+
+        <div id="game-screen" class="hidden">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-4 mb-6">
+                <div>
+                    <h2 id="quiz-title" class="text-xl font-bold"></h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Selecione a resposta correta.</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium">Questão</p>
+                    <p class="text-lg font-bold"><span id="current-question"></span> / <span id="total-questions"></span></p>
+                </div>
+            </div>
+            <div id="question-area" class="mb-6"><p id="question-text" class="text-lg md:text-xl font-semibold leading-relaxed"></p></div>
+            <div id="options-area" class="grid grid-cols-1 gap-4"></div>
+            <div id="action-area" class="mt-6 text-center h-14 flex items-center justify-center">
+                <button id="confirm-button" onclick="confirmAnswer()" class="action-button w-1/2 bg-sky-600 text-white font-bold py-3 px-6 rounded-lg shadow-md disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" disabled>Confirmar</button>
+                <button id="next-button" onclick="nextQuestion()" class="action-button w-1/2 bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500 dark:focus-visible:ring-offset-slate-800">Próxima</button>
+            </div>
+        </div>
+        
+        <div id="end-screen" class="hidden text-center">
+             <h2 class="text-3xl font-bold mb-4">Fim da Rodada!</h2>
+             <p class="text-slate-600 dark:text-slate-400 text-xl mb-2">Sua pontuação foi:</p>
+             <p id="final-score" class="text-6xl font-extrabold text-sky-600 dark:text-sky-400 mb-8"></p>
+             <button onclick="showStartScreen()" class="w-full bg-sky-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800">Jogar Novamente</button>
+        </div>
+
+        <div id="history-screen" class="hidden">
+             <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-300">Histórico de Estudos</h2>
+                <button onclick="showStartScreen()" class="text-sm font-bold bg-slate-200 dark:bg-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-800">Voltar</button>
+            </div>
+            <div class="border-b border-slate-200 dark:border-slate-700 mb-4">
+                <nav class="flex space-x-2" aria-label="Tabs">
+                    <button onclick="showHistoryTab('medium')" id="tab-medium" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Médio</button>
+                    <button onclick="showHistoryTab('hard')" id="tab-hard" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Difícil</button>
+                    <button onclick="showHistoryTab('university')" id="tab-university" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Hard (Univ.)</button>
+                </nav>
+            </div>
+            <div id="history-log-container" class="max-h-80 overflow-y-auto bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg space-y-2"></div>
+            <button onclick="clearHistory()" class="mt-6 w-full text-sm text-center text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded">Limpar todo o histórico</button>
+        </div>
+    </div>
+
+    <script>
+        // --- BANCO DE QUESTÕES EXPANDIDO DE COMPUTAÇÃO EM NUVEM ---
+        const questions = {
+            medium: [
+                { question: "Qual é a abstração fundamental do Amazon EC2?", options: ["Um contêiner leve e portátil.", "Uma Máquina Virtual (VM) na infraestrutura da AWS.", "Uma função serverless que executa código sob demanda.", "Um banco de dados relacional totalmente gerenciado."], answer: "Uma Máquina Virtual (VM) na infraestrutura da AWS." },
+                { question: "O que é uma 'Task Definition' no Amazon ECS?", options: ["Um documento que especifica a imagem Docker e os recursos para um contêiner.", "Uma regra de firewall virtual que controla o tráfego de rede para as instâncias.", "Um modelo pré-configurado para instâncias EC2, incluindo SO e software.", "Um script que automatiza a implantação de aplicações em um ambiente PaaS."], answer: "Um documento que especifica a imagem Docker e os recursos para um contêiner." },
+                { question: "Qual é a principal característica da computação Serverless?", options: ["O desenvolvedor gerencia manualmente a escalabilidade dos servidores.", "O provedor de nuvem gerencia dinamicamente a alocação de recursos.", "A cobrança é feita por um valor fixo mensal, independentemente do uso.", "As aplicações são executadas em servidores on-premises do cliente."], answer: "O provedor de nuvem gerencia dinamicamente a alocação de recursos." },
+                { question: "No Kubernetes, qual componente do Control Plane armazena todos os dados do cluster?", options: ["API Server", "Scheduler", "etcd", "Controller Manager"], answer: "etcd" },
+                { question: "Qual serviço da AWS corresponde a um modelo PaaS (Plataforma como Serviço)?", options: ["Amazon EC2", "Amazon S3", "AWS Lambda", "Amazon Elastic Beanstalk"], answer: "Amazon Elastic Beanstalk" },
+                { question: "O que é 'Infraestrutura como Código' (IaC)?", options: ["A prática de escrever o código da aplicação em uma linguagem de baixo nível.", "O gerenciamento de infraestrutura através de código e arquivos de configuração.", "A configuração manual de servidores usando uma interface gráfica web.", "O monitoramento do desempenho da aplicação por meio de logs e métricas."], answer: "O gerenciamento de infraestrutura através de código e arquivos de configuração." },
+                { question: "Qual a função de um 'Security Group' no contexto do Amazon EC2?", options: ["Balancear a carga de tráfego entre múltiplas instâncias para alta disponibilidade.", "Fornecer armazenamento persistente de dados para as instâncias, como um disco rígido.", "Atuar como um firewall virtual, controlando o tráfego de entrada e saída.", "Armazenar imagens de contêiner para serem usadas pelo Amazon ECS."], answer: "Atuar como um firewall virtual, controlando o tráfego de entrada e saída." },
+                { question: "No Kubernetes, qual é a menor unidade de implantação?", options: ["Nó (Node)", "Serviço (Service)", "Pod", "Cluster"], answer: "Pod" },
+                { question: "O que significa dizer que uma arquitetura é 'Event-Driven' (Orientada a Eventos)?", options: ["Que o código é executado em intervalos de tempo fixos, definidos pelo desenvolvedor.", "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo.", "Que a aplicação só pode ser acessada através de uma API RESTful.", "Que a infraestrutura é provisionada manually antes da execução do código."], answer: "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo." },
+                { question: "Qual o objetivo principal do AWS IAM (Identity and Access Management)?", options: ["Monitorar as métricas de desempenho dos recursos da AWS, como CPU e memória.", "Controlar o acesso aos recursos da AWS, definindo permissões para usuários e serviços.", "Orquestrar a implantação de contêineres em um cluster de instâncias EC2.", "Fornecer uma rede virtual isolada para lançar recursos da AWS com segurança."], answer: "Controlar o acesso aos recursos da AWS, definindo permissões para usuários e serviços." },
+                { question: "O que é uma AMI (Amazon Machine Image)?", options: ["Um serviço de banco de dados NoSQL totalmente gerenciado pela AWS.", "Um modelo pré-configurado para instâncias EC2, contendo SO e software.", "Uma interface de linha de comando para interagir com os serviços da AWS.", "Um contêiner Docker otimizado para rodar em ambientes da Amazon."], answer: "Um modelo pré-configurado para instâncias EC2, contendo SO e software." },
+                { question: "Qual é o principal propósito do Amazon S3 (Simple Storage Service)?", options: ["Executar código de aplicação em resposta a eventos de forma serverless.", "Fornecer poder computacional escalável na forma de máquinas virtuais.", "Armazenar e recuperar qualquer quantidade de dados, a qualquer momento, de qualquer lugar.", "Oferecer um serviço de banco de dados relacional gerenciado com alta disponibilidade."], answer: "Armazenar e recuperar qualquer quantidade de dados, a qualquer momento, de qualquer lugar." },
+                { question: "No contexto da AWS, o que é uma VPC (Virtual Private Cloud)?", options: ["Um data center físico localizado em uma região geográfica específica.", "Uma rede virtual logicamente isolada dentro da nuvem da AWS.", "Um serviço de balanceamento de carga que distribui o tráfego de entrada.", "Um contêiner que agrupa uma ou mais aplicações para implantação."], answer: "Uma rede virtual logicamente isolada dentro da nuvem da AWS." },
+                { question: "Qual a função do AWS Auto Scaling?", options: ["Realizar backups automáticos de bancos de dados RDS em horários pré-definidos.", "Ajustar automaticamente o número de instâncias EC2 com base na demanda.", "Criptografar automaticamente os dados armazenados em volumes EBS.", "Distribuir o tráfego de rede entre diferentes Zonas de Disponibilidade."], answer: "Ajustar automaticamente o número de instâncias EC2 com base na demanda." },
+                { question: "Qual componente do Kubernetes é responsável por expor a API do cluster?", options: ["etcd", "Scheduler", "API Server", "Kubelet"], answer: "API Server" },
+                { question: "O que é 'Integração Contínua' (CI)?", options: ["A prática de implantar o software em produção após cada alteração no código.", "O processo de mesclar frequentemente alterações de código em um repositório central.", "A configuração manual de novos servidores para cada nova versão do software.", "A entrega do software em um pacote físico para o cliente final."], answer: "O processo de mesclar frequentemente alterações de código em um repositório central." },
+                { question: "Qual é a principal vantagem dos contêineres sobre as VMs?", options: ["Contêineres são mais pesados, pois incluem uma cópia completa do SO.", "Contêineres são mais leves e rápidos, pois compartilham o kernel do SO do host.", "VMs são mais portáteis, pois não dependem do sistema operacional hospedeiro.", "VMs iniciam em segundos, enquanto contêineres levam vários minutos."], answer: "Contêineres são mais leves e rápidos, pois compartilham o kernel do SO do host." },
+                { question: "Para que serve o serviço Amazon CloudWatch?", options: ["Para gerenciar identidades de usuários e suas permissões de acesso.", "Para armazenar objetos, como imagens e vídeos, de forma escalável.", "Para monitorar métricas e logs dos recursos e aplicações na AWS.", "Para provisionar e gerenciar bancos de dados relacionais na nuvem."], answer: "Para monitorar métricas e logs dos recursos e aplicações na AWS." },
+                { question: "O que define um modelo de cobrança 'Baseado em Consumo'?", options: ["Um pagamento mensal fixo, independentemente da quantidade de recursos utilizados.", "O custo é definido pelo volume de recursos computacionais utilizados.", "O preço é atrelado a indicadores de desempenho do negócio (KPIs).", "Uma combinação de pagamento fixo com cobrança por uso excedente."], answer: "O custo é definido pelo volume de recursos computacionais utilizados." },
+                { question: "Qual a função de uma 'Route Table' (Tabela de Rotas) em uma VPC?", options: ["Filtrar o tráfego de entrada e saída de uma instância, como um firewall.", "Conectar duas VPCs para permitir a comunicação direta entre elas.", "Determinar para onde o tráfego de rede de uma sub-rede deve ser direcionado.", "Traduzir endereços de rede privados para públicos para acesso à internet."], answer: "Determinar para onde o tráfego de rede de uma sub-rede deve ser direcionado." },
+                { question: "O que é um modelo de cobrança Híbrido na nuvem?", options: ["Cobrança baseada exclusivamente em KPIs de negócio.", "Uma combinação de diferentes modelos, como assinatura e consumo.", "Um pagamento único vitalício pelo acesso aos serviços da nuvem.", "Cobrança baseada no número de usuários ativos na plataforma."], answer: "Uma combinação de diferentes modelos, como assinatura e consumo." },
+                { question: "Qual o propósito principal do Amazon EBS (Elastic Block Store)?", options: ["Armazenar objetos estáticos como imagens e vídeos para acesso via web.", "Fornecer armazenamento de bloco persistente para instâncias EC2.", "Executar funções de código sem gerenciar servidores ou infraestrutura.", "Monitorar e coletar logs de todos os serviços da AWS em um local centralizado."], answer: "Fornecer armazenamento de bloco persistente para instâncias EC2." },
+                { question: "Qual a unidade básica de implantação no AWS Lambda?", options: ["Contêiner", "Máquina Virtual", "Função", "Pod"], answer: "Função" },
+                { question: "Qual o principal serviço da AWS para orquestração de contêineres?", options: ["AWS Lambda", "Amazon EC2", "Amazon ECS", "Amazon S3"], answer: "Amazon ECS" },
+                { question: "O que o Amazon RDS (Relational Database Service) gerencia?", options: ["Aplicações web completas, incluindo o código e a infraestrutura.", "Bancos de dados relacionais, automatizando tarefas como backups e patches.", "Contêineres Docker, gerenciando seu ciclo de vida e escalabilidade.", "O armazenamento de objetos em buckets para alta durabilidade."], answer: "Bancos de dados relacionais, automatizando tarefas como backups e patches." },
+                { question: "O que é um 'SLA' (Service Level Agreement)?", options: ["Um modelo de cobrança baseado em indicadores de desempenho.", "Um acordo que garante níveis de desempenho de um serviço.", "Uma ferramenta para automatizar a implantação de infraestrutura.", "Um tipo de firewall virtual para controlar o tráfego de rede."], answer: "Um acordo que garante níveis de desempenho de um serviço." },
+                { question: "Qual componente do Kubernetes seleciona o nó ideal para um novo Pod?", options: ["API Server", "etcd", "Controller Manager", "Scheduler"], answer: "Scheduler" },
+                { question: "O que o termo 'cloud-native' significa?", options: ["Aplicações legadas que foram movidas para a nuvem sem modificações.", "Um paradigma para construir aplicações que aproveitam a nuvem.", "Um software que só pode ser executado em um único provedor de nuvem.", "A prática de evitar o uso de contêineres em ambientes de produção."], answer: "Um paradigma para construir aplicações que aproveitam a nuvem." },
+                { question: "Qual a melhor prática de segurança recomendada para o AWS IAM?", options: ["Compartilhar a senha do usuário root com toda a equipe de desenvolvimento.", "Habilitar a autenticação multifator (MFA) para os usuários.", "Atribuir permissões de administrador a todos os novos usuários por padrão.", "Nunca rotacionar as chaves de acesso programático para evitar quebras."], answer: "Habilitar a autenticação multifator (MFA) para os usuários." },
+                { question: "O que é um 'Pod' no Kubernetes?", options: ["A maior unidade de gerenciamento, representando o cluster inteiro.", "Um conjunto de nós de trabalho que executam as aplicações.", "A menor e mais simples unidade no modelo de objetos do Kubernetes.", "Um balanceador de carga que distribui o tráfego entre contêineres."], answer: "A menor e mais simples unidade no modelo de objetos do Kubernetes." },
+                { question: "Qual a função do Kube-proxy no Kubernetes?", options: ["Garantir que os contêineres estejam em execução em um nó.", "Manter as regras de rede nos nós, permitindo a comunicação.", "Armazenar o estado desejado de todos os objetos do cluster.", "Tomar decisões globais sobre o agendamento de novos pods."], answer: "Manter as regras de rede nos nós, permitindo a comunicação." },
+                { question: "O que é o Azure Container Registry (ACR)?", options: ["Um serviço para executar contêineres de forma serverless no Azure.", "Um registro privado para armazenar e gerenciar imagens de contêiner.", "Uma ferramenta para monitorar o desempenho de clusters AKS.", "Um orquestrador de contêineres alternativo ao Kubernetes."], answer: "Um registro privado para armazenar e gerenciar imagens de contêiner." },
+                { question: "Qual o principal diferencial do Google Kubernetes Engine (GKE)?", options: ["É o único serviço que oferece um control plane gratuito.", "Seus dois modos de operação: Standard e Autopilot.", "Sua integração nativa e exclusiva com o Microsoft Entra ID.", "Não suporta autoescalonamento de nós, apenas de pods."], answer: "Seus dois modos de operação: Standard e Autopilot." },
+                { question: "O que caracteriza uma aplicação em nuvem?", options: ["Um programa que só pode ser executado em um computador desktop.", "Um software que reside e é executado na infraestrutura de um provedor de nuvem.", "Uma aplicação que não requer acesso à internet para funcionar.", "Um sistema legado que opera exclusivamente em um mainframe."], answer: "Um software que reside e é executado na infraestrutura de um provedor de nuvem." },
+                { question: "Qual modelo de serviço de nuvem o Amazon Elastic Beanstalk representa?", options: ["IaaS (Infraestrutura como Serviço)", "SaaS (Software como Serviço)", "PaaS (Plataforma como Serviço)", "FaaS (Função como Serviço)"], answer: "PaaS (Plataforma como Serviço)" },
+                { question: "Qual o principal benefício do 'self-healing' no Kubernetes?", options: ["Ele previne falhas de hardware antes que ocorram.", "Ele reinicia contêineres que falham e os reagenda se um nó cair.", "Ele corrige bugs no código da aplicação automaticamente.", "Ele otimiza o código para reduzir o consumo de CPU."], answer: "Ele reinicia contêineres que falham e os reagenda se um nó cair." },
+                { question: "O que é uma 'Política IAM' (IAM Policy)?", options: ["Um documento que define quem pode fazer o quê em quais recursos.", "Um conjunto de credenciais de acesso temporárias para um serviço.", "Um usuário virtual com permissões de administrador no IAM.", "Uma regra de firewall que se aplica a um grupo de instâncias EC2."], answer: "Um documento que define quem pode fazer o quê em quais recursos." },
+                { question: "Qual é um exemplo de banco de dados NÃO suportado pelo Amazon RDS?", options: ["PostgreSQL", "MySQL", "MongoDB", "Oracle"], answer: "MongoDB" },
+                { question: "O que é o conceito de 'portabilidade' em contêineres?", options: ["A capacidade de um contêiner ser executado de forma consistente em qualquer ambiente.", "A limitação de um contêiner a um único tipo de sistema operacional.", "A necessidade de reescrever o código da aplicação para cada provedor de nuvem.", "A velocidade com que um contêiner pode ser iniciado ou parado."], answer: "A capacidade de um contêiner ser executado de forma consistente em qualquer ambiente." },
+                { question: "O que o Azure Functions usa para se conectar a outros serviços de forma declarativa?", options: ["SDKs complexos", "Arquivos YAML", "Bindings", "API Gateway"], answer: "Bindings" },
+                { question: "Qual o principal objetivo da 'Entrega Contínua' (CD)?", options: ["Automatizar a detecção de erros de integração de código.", "Automatizar o lançamento de código validado para um ambiente.", "Gerenciar manualmente a infraestrutura de produção.", "Escrever testes unitários para cada nova funcionalidade."], answer: "Automatizar o lançamento de código validado para um ambiente." },
+                { question: "O que é um 'worker node' no Kubernetes?", options: ["O cérebro do cluster, que toma todas as decisões de gerenciamento.", "Uma máquina (física ou virtual) que executa as aplicações em contêineres.", "O banco de dados que armazena o estado de configuração do cluster.", "Um proxy de rede que gerencia toda a comunicação externa."], answer: "Uma máquina (física ou virtual) que executa as aplicações em contêineres." },
+                { question: "O que é 'VPC Peering'?", options: ["Um componente que conecta duas VPCs para comunicação direta.", "Um gateway que permite acesso seguro à internet para redes privadas.", "Uma tabela que define as regras de roteamento dentro de uma VPC.", "Um firewall que protege toda a rede virtual contra ataques externos."], answer: "Um componente que conecta duas VPCs para comunicação direta." },
+                { question: "Qual provedor de FaaS é conhecido por sua integração com o ecossistema .NET?", options: ["AWS Lambda", "Google Cloud Functions", "Azure Functions", "IBM Cloud Functions"], answer: "Azure Functions" },
+                { question: "Qual a função do 'container runtime' em um nó do Kubernetes?", options: ["Monitorar a saúde do nó e reportar ao control plane.", "Gerenciar as regras de rede para a comunicação dos pods.", "O software responsável por efetivamente executar os contêineres.", "Agendar quais pods devem ser executados em qual nó."], answer: "O software responsável por efetivamente executar os contêineres." },
+                { question: "Qual o benefício da 'repetibilidade' na IaC?", options: ["Permite que cada ambiente (dev, teste, prod) tenha uma configuração única.", "Garante que o mesmo ambiente possa ser implantado várias vezes de forma consistente.", "Acelera a execução do código da aplicação em produção.", "Reduz o número de testes necessários no pipeline de CI/CD."], answer: "Garante que o mesmo ambiente possa ser implantado várias vezes de forma consistente." },
+                { question: "O que caracteriza o modelo 'Backend as a Service' (BaaS)?", options: ["Permite executar pequenos trechos de código em resposta a eventos.", "Fornece funcionalidades de backend prontas para uso, como autenticação.", "Exige que o desenvolvedor gerencie todo o banco de dados e servidores.", "É focado na orquestração de contêineres em larga escala."], answer: "Fornece funcionalidades de backend prontas para uso, como autenticação." },
+                { question: "Qual é o principal caso de uso para o AWS EKS Anywhere?", options: ["Executar clusters Kubernetes de forma serverless na nuvem da AWS.", "Criar e operar clusters Kubernetes em infraestrutura on-premises.", "Simplificar o desenvolvimento de funções Lambda para iniciantes.", "Gerenciar bancos de dados NoSQL em um ambiente multi-cloud."], answer: "Criar e operar clusters Kubernetes em infraestrutura on-premises." },
+                { question: "Qual a principal vantagem do GKE Autopilot?", options: ["Oferece controle total sobre a configuração dos nós de trabalho.", "Gerencia toda a infraestrutura do cluster, incluindo os nós.", "É mais barato para cargas de trabalho que rodam continuamente.", "Requer mais configuração manual que o modo Standard."], answer: "Gerencia toda a infraestrutura do cluster, incluindo os nós." },
+                { question: "O que é um 'rolling update' no Kubernetes?", options: ["Uma estratégia de implantação que atualiza os pods um por um, sem downtime.", "A reinicialização de todo o cluster para aplicar uma atualização de segurança.", "A criação de uma cópia exata do ambiente de produção para testes.", "A reversão de uma implantação para a versão estável anterior."], answer: "Uma estratégia de implantação que atualiza os pods um por um, sem downtime." }
+            ],
+            hard: [
+                { question: "Qual a diferença entre os modos 'AWS Fargate' e 'EC2' no Amazon ECS?", options: ["Fargate exige que o usuário gerencie as instâncias EC2, enquanto o modo EC2 é serverless.", "O modo EC2 é mais caro e oferece menos controle granular sobre a rede e o armazenamento.", "Fargate é uma opção serverless que abstrai a gestão de servidores, enquanto o modo EC2 não.", "O modo Fargate é projetado para aplicações com estado, e o modo EC2 para as sem estado."], answer: "Fargate é uma opção serverless que abstrai a gestão de servidores, enquanto o modo EC2 não." },
+                { question: "Como uma 'Role' no AWS IAM se diferencia de um 'User'?", options: ["Um Usuário tem credenciais permanentes, enquanto uma Função assume permissões temporárias.", "Uma Função não pode ter políticas de permissão anexadas, ao contrário de um Usuário.", "Um Usuário representa um serviço da AWS, e uma Função representa uma pessoa.", "Funções são usadas para acesso via console, e Usuários para acesso programático via API."], answer: "Um Usuário tem credenciais permanentes, enquanto uma Função assume permissões temporárias." },
+                { question: "Qual a diferença fundamental entre a abordagem 'declarativa' e 'imperativa' em IaC?", options: ["A imperativa define o estado final ('o quê'), e a declarativa define os passos ('como').", "A declarativa define o estado final ('o quê'), e a imperativa define os passos ('como').", "Apenas a abordagem imperativa pode ser versionada em um repositório Git.", "Terraform é uma ferramenta imperativa, enquanto scripts de shell são declarativos."], answer: "A declarativa define o estado final ('o quê'), e a imperativa define os passos ('como')." },
+                { question: "No Amazon RDS, o que o recurso 'Multi-AZ' oferece?", options: ["A capacidade de escalar a capacidade de leitura do banco de dados criando réplicas.", "Backups automatizados do banco de dados para recuperação em um ponto no tempo.", "Alta disponibilidade, mantendo uma réplica de standby em outra Zona de Disponibilidade.", "Isolamento de rede para o banco de dados dentro de uma Virtual Private Cloud (VPC)."], answer: "Alta disponibilidade, mantendo uma réplica de standby em outra Zona de Disponibilidade." },
+                { question: "O que é o desafio de 'Vendor Lock-in' no contexto Serverless?", options: ["Uma falha de segurança que bloqueia o acesso do fornecedor aos seus recursos na nuvem.", "A facilidade de migrar funções entre provedores devido à padronização das APIs.", "A dificuldade de migração devido ao acoplamento das funções a serviços do provedor.", "Um modelo de cobrança que prende o cliente a um contrato de longo prazo sem flexibilidade."], answer: "A dificuldade de migração devido ao acoplamento das funções a serviços do provedor." },
+                { question: "Como o EKS Anywhere expande as capacidades do Amazon EKS?", options: ["Ele permite criar e operar clusters Kubernetes em servidores on-premises do cliente.", "É uma versão mais barata do EKS, projetada para ambientes de desenvolvimento.", "Ele automatiza a gestão dos worker nodes, tornando o EKS totalmente serverless.", "É uma ferramenta de monitoramento que fornece observabilidade para clusters EKS."], answer: "Ele permite criar e operar clusters Kubernetes em servidores on-premises do cliente." },
+                { question: "Qual a diferença entre 'Entrega Contínua' e 'Implantação Contínua'?", options: ["A Entrega Contínua automatiza o deploy em produção, enquanto a Implantação Contínua não.", "A Implantação Contínua é um processo manual, enquanto a Entrega Contínua é automatizada.", "A Entrega Contínua requer uma aprovação manual para o deploy em produção; a Implantação não.", "Não há diferença, os termos são usados de forma intercambiável na indústria."], answer: "A Entrega Contínua requer uma aprovação manual para o deploy em produção; a Implantação não." },
+                { question: "Qual a função de um 'NAT Gateway' em uma Amazon VPC?", options: ["Conectar duas VPCs para permitir a comunicação direta e privada entre elas.", "Permitir que recursos em sub-redes privadas acessem a internet de forma segura.", "Determinar o caminho do tráfego de rede, agindo como um roteador virtual.", "Atuar como um firewall no nível da sub-rede, controlando o tráfego de entrada e saída."], answer: "Permitir que recursos em sub-redes privadas acessem a internet de forma segura." },
+                { question: "O que são 'contêineres imutáveis' e por que são uma melhor prática?", options: ["Contêineres que, uma vez criados, não podem ser excluídos ou parados.", "Uma prática onde, para qualquer alteração, uma nova imagem é construída e implantada.", "Contêineres que podem ser modificados em tempo de execução para aplicar atualizações.", "Um tipo de contêiner que não permite o uso de volumes para persistência de dados."], answer: "Uma prática onde, para qualquer alteração, uma nova imagem é construída e implantada." },
+                { question: "Qual o papel do 'Kubelet' na arquitetura do Kubernetes?", options: ["É o banco de dados chave-valor que armazena o estado do cluster.", "É o ponto de entrada da API que valida todas as requisições ao cluster.", "É um proxy de rede que gerencia as regras de comunicação entre os pods.", "É um agente que roda em cada nó, garantindo que os contêineres estejam em execução."], answer: "É um agente que roda em cada nó, garantindo que os contêineres estejam em execução." },
+                { question: "Qual o diferencial do Azure Kubernetes Service (AKS) em relação à integração de identidade?", options: ["Ele utiliza o AWS IAM para gerenciamento de acesso, permitindo um ambiente multi-cloud.", "Sua integração nativa com o Microsoft Entra ID para usar identidades corporativas.", "Ele não possui integração com nenhum sistema de identidade, exigindo configuração manual.", "Ele utiliza o Google Cloud IAM, unificando a autenticação com os serviços do Google."], answer: "Sua integração nativa com o Microsoft Entra ID para usar identidades corporativas." },
+                { question: "O que é o problema de 'Denial of Wallet' no contexto Serverless?", options: ["Uma falha de segurança que permite o roubo de credenciais de pagamento da conta na nuvem.", "A recusa do provedor de nuvem em processar o pagamento da fatura, bloqueando os serviços.", "Uma fatura inesperadamente alta devido a um pico de invocações de funções.", "A incapacidade da plataforma de escalar, resultando em perda de receita para a aplicação."], answer: "Uma fatura inesperadamente alta devido a um pico de invocações de funções." },
+                { question: "Como o AWS Fargate se diferencia dos 'Managed Node Groups' no Amazon EKS?", options: ["Fargate é uma opção onde o usuário gerencia as instâncias EC2, enquanto os Node Groups são serverless.", "Fargate é uma opção serverless, onde não é necessário provisionar servidores para os pods.", "Managed Node Groups não suportam autoescalonamento, ao contrário do Fargate.", "Fargate é um serviço para executar VMs, enquanto Node Groups são para contêineres."], answer: "Fargate é uma opção serverless, onde não é necessário provisionar servidores para os pods." },
+                { question: "Qual a principal diferença entre os modos 'Standard' e 'Autopilot' no Google Kubernetes Engine (GKE)?", options: ["No modo Standard, o Google gerencia os nós, enquanto no Autopilot o usuário gerencia.", "O modo Autopilot é mais caro e oferece menos automação que o modo Standard.", "No Autopilot, o GKE gerencia toda a infraestrutura do cluster, incluindo os nós.", "O modo Standard não suporta autoescalonamento, apenas o modo Autopilot."], answer: "No Autopilot, o GKE gerencia toda a infraestrutura do cluster, incluindo os nós." },
+                { question: "O que o gerenciamento declarativo do Kubernetes permite?", options: ["Executar uma série de comandos para configurar o ambiente passo a passo.", "Definir o estado desejado da aplicação e deixar o Kubernetes alcançá-lo.", "Modificar contêineres em execução para aplicar patches de segurança.", "Requerer intervenção manual para reiniciar contêineres que falharam."], answer: "Definir o estado desejado da aplicação e deixar o Kubernetes alcançá-lo." },
+                { question: "Por que a portabilidade é um benefício chave do Kubernetes?", options: ["Porque ele só pode ser executado em um único provedor de nuvem, garantindo consistência.", "Porque ele abstrai a infraestrutura, permitindo rodar aplicações em qualquer nuvem.", "Porque ele requer que as aplicações sejam reescritas para cada novo ambiente.", "Porque ele é otimizado para rodar apenas em infraestrutura on-premises."], answer: "Porque ele abstrai a infraestrutura, permitindo rodar aplicações em qualquer nuvem." },
+                { question: "Qual componente do Control Plane do Kubernetes é responsável por reconciliar o estado atual com o desejado?", options: ["API Server", "etcd", "Scheduler", "Controller Manager"], answer: "Controller Manager" },
+                { question: "No contexto de CI/CD para Kubernetes, qual é o fluxo típico após o build de uma nova imagem de contêiner?", options: ["A imagem é implantada manualmente no cluster pelo desenvolvedor.", "A imagem é enviada para um registro de contêineres, como o ECR ou ACR.", "Um novo servidor físico é provisionado para hospedar a nova imagem.", "O código-fonte é copiado diretamente para dentro dos pods em execução."], answer: "A imagem é enviada para um registro de contêineres, como o ECR ou ACR." },
+                { question: "Qual é uma desvantagem da virtualização baseada em VMs em comparação com contêineres?", options: ["VMs iniciam mais rápido e consomem menos recursos que os contêineres.", "Cada VM requer uma cópia completa de um sistema operacional, sendo mais pesada.", "Contêineres oferecem um nível de isolamento de hardware superior ao das VMs.", "VMs são mais portáteis, pois não dependem do kernel do sistema operacional."], answer: "Cada VM requer uma cópia completa de um sistema operacional, sendo mais pesada." },
+                { question: "Como o Azure Monitor se integra ao AKS?", options: ["Ele gerencia o registro e o armazenamento de imagens de contêiner para o AKS.", "Ele fornece monitoramento abrangente, coletando métricas e logs do cluster.", "Ele unifica a autenticação e autorização do cluster com o Microsoft Entra ID.", "Ele provisiona e gerencia os grupos de nós (Node Pools) para o cluster AKS."], answer: "Ele fornece monitoramento abrangente, coletando métricas e logs do cluster." },
+                { question: "O que é 'orquestração de armazenamento' no Kubernetes?", options: ["A prática de armazenar todos os dados da aplicação na memória do contêiner.", "A capacidade de montar automaticamente sistemas de armazenamento de diversas fontes.", "A criptografia automática de todos os dados gravados nos worker nodes.", "A compactação de dados para reduzir o espaço utilizado em disco."], answer: "A capacidade de montar automaticamente sistemas de armazenamento de diversas fontes." },
+                { question: "Qual dos seguintes é um benefício da IaC relacionado à auditoria?", options: ["A IaC elimina a necessidade de logs, pois a infraestrutura nunca falha.", "As alterações são feitas manualmente, facilitando a identificação do responsável.", "O armazenamento das definições no Git cria um histórico completo de alterações.", "A auditoria se torna desnecessária, pois os ambientes são sempre consistentes."], answer: "O armazenamento das definições no Git cria um histórico completo de alterações." },
+                { question: "Qual o principal desafio de depuração em uma arquitetura serverless?", options: ["A simplicidade de ter todo o código em um único local (monólito).", "A dificuldade de rastrear requisições em um sistema distribuído de funções.", "A falta de ferramentas de log nos principais provedores de nuvem.", "A natureza com estado (stateful) dos contêineres que executam as funções."], answer: "A dificuldade de rastrear requisições em um sistema distribuído de funções." },
+                { question: "Qual a principal diferença entre os 'bindings' do Azure Functions e a configuração do AWS Lambda?", options: ["O Lambda usa uma abordagem declarativa, enquanto o Azure Functions é centrado em código.", "Os 'bindings' do Azure Functions simplificam a integração com outros serviços.", "O Lambda não permite integrações com outros serviços da AWS, apenas o Azure.", "A configuração do Lambda é mais simples, mas oferece menos controle que os 'bindings'."], answer: "Os 'bindings' do Azure Functions simplificam a integração com outros serviços." },
+                { question: "O que uma implantação 'Blue/Green' envolve?", options: ["Liberar a nova versão para um pequeno grupo de usuários e monitorar o impacto.", "Atualizar os contêineres um por um para evitar tempo de inatividade.", "Manter dois ambientes de produção idênticos e alternar o tráfego entre eles.", "Reverter a aplicação para a versão anterior em caso de falha na implantação."], answer: "Manter dois ambientes de produção idênticos e alternar o tráfego entre eles." },
+                { question: "Qual provedor de nuvem é o criador original do Kubernetes?", options: ["Amazon Web Services (AWS)", "Microsoft Azure", "Google Cloud", "IBM Cloud"], answer: "Google Cloud" },
+                { question: "O que o termo 'stateless' (sem estado) significa no contexto de funções FaaS?", options: ["A função armazena dados de execuções anteriores em sua memória local.", "Cada invocação da função é tratada como uma transação independente.", "A função requer um banco de dados para armazenar seu estado de execução.", "A plataforma garante que a mesma instância da função atenda a todas as requisições."], answer: "Cada invocação da função é tratada como uma transação independente." },
+                { question: "Qual a função do 'Cluster Autoscaler' no Kubernetes?", options: ["Aumentar ou diminuir o número de pods de uma aplicação.", "Aumentar ou diminuir o número de nós (VMs) do cluster.", "Ajustar verticalmente a CPU e memória solicitada por um pod.", "Balancear a carga de tráfego entre os nós existentes."], answer: "Aumentar ou diminuir o número de nós (VMs) do cluster." },
+                { question: "O que o Amazon ECR (Elastic Container Registry) fornece?", options: ["Um serviço de computação serverless para executar contêineres sem gerenciar servidores.", "Um registro de imagens de contêiner privado, seguro e gerenciado.", "Um orquestrador de contêineres baseado no projeto de código aberto Kubernetes.", "Um serviço de monitoramento para coletar métricas de clusters de contêineres."], answer: "Um registro de imagens de contêiner privado, seguro e gerenciado." },
+                { question: "Qual é o principal caso de uso para uma arquitetura serverless?", options: ["Aplicações monolíticas com processos de longa duração e estado persistente.", "Bancos de dados relacionais que exigem alta performance e baixa latência.", "Arquiteturas orientadas a eventos e processamento de dados em tempo real.", "Gerenciamento de clusters de contêineres com requisitos de rede complexos."], answer: "Arquiteturas orientadas a eventos e processamento de dados em tempo real." },
+                { question: "O que é 'orquestração de contêineres'?", options: ["O processo de construir imagens de contêiner a partir de um Dockerfile.", "A automação da implantação, dimensionamento e gerenciamento de contêineres.", "A virtualização do sistema operacional para isolar aplicações.", "O armazenamento de imagens de contêiner em um registro público ou privado."], answer: "A automação da implantação, dimensionamento e gerenciamento de contêineres." },
+                { question: "Qual a principal diferença entre o EKS e o ECS?", options: ["ECS é baseado em Kubernetes, enquanto EKS é uma tecnologia proprietária da AWS.", "EKS é baseado em Kubernetes, enquanto ECS é uma tecnologia proprietária da AWS.", "Ambos são baseados em Kubernetes, mas o EKS é mais barato que o ECS.", "ECS é usado para serverless, e EKS é usado para máquinas virtuais."], answer: "EKS é baseado em Kubernetes, enquanto ECS é uma tecnologia proprietária da AWS." },
+                { question: "Qual dos seguintes NÃO é um componente do Control Plane do Kubernetes?", options: ["API Server", "etcd", "Scheduler", "Kubelet"], answer: "Kubelet" },
+                { question: "Por que o 'tempo de inicialização' é uma vantagem dos contêineres sobre as VMs?", options: ["Contêineres levam vários minutos para iniciar, permitindo mais verificações.", "VMs iniciam em segundos, enquanto contêineres podem levar horas.", "Contêineres iniciam em segundos, pois não precisam carregar um SO completo.", "O tempo de inicialização é idêntico para ambos, não sendo uma vantagem."], answer: "Contêineres iniciam em segundos, pois não precisam carregar um SO completo." },
+                { question: "Qual o foco principal de uma equipe de DevOps?", options: ["Apenas o desenvolvimento de novas funcionalidades para a aplicação.", "Apenas a operação e manutenção da infraestrutura de produção.", "A colaboração entre equipes de desenvolvimento e operações para automatizar a entrega.", "A segurança da informação e a conformidade com as regulamentações."], answer: "A colaboração entre equipes de desenvolvimento e operações para automatizar a entrega." },
+                { question: "O que é um 'Service' no Kubernetes?", options: ["Um pod que executa tarefas de gerenciamento e monitoramento do cluster.", "Um objeto que fornece um ponto de acesso de rede estável para um conjunto de pods.", "Uma instância de máquina virtual que atua como um nó de trabalho no cluster.", "Um script de automação que define o pipeline de CI/CD para a aplicação."], answer: "Um objeto que fornece um ponto de acesso de rede estável para um conjunto de pods." },
+                { question: "Qual a principal vantagem do GKE sobre o AKS e EKS em termos de autoescalonamento?", options: ["O GKE é o único que suporta o escalonamento horizontal de pods (HPA).", "O GKE oferece um autoescalonamento de quatro vias, incluindo o vertical de pods (VPA).", "O AKS e o EKS não possuem nenhum tipo de capacidade de autoescalonamento.", "O autoescalonamento do GKE é mais lento, porém mais preciso que o dos concorrentes."], answer: "O GKE oferece um autoescalonamento de quatro vias, incluindo o vertical de pods (VPA)." },
+                { question: "Como a AWS cobra pelo control plane do EKS?", options: ["É totalmente gratuito, a cobrança é apenas pelos nós de trabalho.", "Pago por hora por cluster, garantindo alta disponibilidade por padrão.", "A cobrança é baseada no número de pods em execução no cluster.", "Existe um pagamento único na criação do cluster, sem custos recorrentes."], answer: "Pago por hora por cluster, garantindo alta disponibilidade por padrão." },
+                { question: "O que é um 'release channel' no GKE?", options: ["Um canal de comunicação para suporte técnico com a equipe do Google.", "Uma funcionalidade que permite atualizações automáticas controladas do cluster.", "Um tipo de rede virtual para conectar clusters GKE em diferentes regiões.", "Uma política de segurança que restringe o acesso ao control plane do cluster."], answer: "Uma funcionalidade que permite atualizações automáticas controladas do cluster." },
+                { question: "Qual o principal benefício de usar o Terraform para IaC?", options: ["Ele é uma ferramenta específica da AWS, otimizada para seus serviços.", "É agnóstico de nuvem, permitindo gerenciar recursos em múltiplos provedores.", "Sua abordagem imperativa oferece controle total sobre cada comando executado.", "Ele não requer o armazenamento de arquivos de estado, simplificando o gerenciamento."], answer: "É agnóstico de nuvem, permitindo gerenciar recursos em múltiplos provedores." },
+                { question: "O que o AWS CloudFormation faz?", options: ["Executa contêineres Docker de forma serverless, sem gerenciar instâncias.", "Fornece um serviço de IaC declarativo para modelar e provisionar recursos da AWS.", "Monitora a saúde das aplicações, enviando alertas em caso de falhas.", "Oferece um banco de dados NoSQL totalmente gerenciado e escalável."], answer: "Fornece um serviço de IaC declarativo para modelar e provisionar recursos da AWS." },
+                { question: "No modelo de responsabilidade compartilhada, de quem é a responsabilidade pela segurança 'DA' nuvem?", options: ["Do cliente, que deve proteger os data centers e a infraestrutura física.", "Do provedor de nuvem (ex: AWS), que protege a infraestrutura que executa os serviços.", "É uma responsabilidade compartilhada igualmente entre o cliente e o provedor.", "De uma empresa de auditoria externa, que certifica a segurança do ambiente."], answer: "Do provedor de nuvem (ex: AWS), que protege a infraestrutura que executa os serviços." },
+                { question: "O que é um 'Dockerfile'?", options: ["Um arquivo de manifesto YAML para implantar aplicações no Kubernetes.", "Um script de texto que contém instruções para construir uma imagem de contêiner.", "Um arquivo de configuração que define as regras de um Security Group.", "Um documento que descreve a arquitetura de uma aplicação em nuvem."], answer: "Um script de texto que contém instruções para construir uma imagem de contêiner." },
+                { question: "O que é o conceito de 'observabilidade' em sistemas nativos da nuvem?", options: ["A capacidade de inferir o estado interno de um sistema a partir de seus outputs externos.", "A prática de ocultar os logs e métricas da aplicação para proteger a propriedade intelectual.", "A segurança do sistema, garantindo que apenas usuários autorizados possam observá-lo.", "A otimização do sistema para que ele consuma o mínimo de recursos de observação."], answer: "A capacidade de inferir o estado interno de um sistema a partir de seus outputs externos." },
+                { question: "Qual a função do 'API Gateway' em uma arquitetura serverless?", options: ["Executar o código das funções Lambda em um ambiente seguro e isolado.", "Atuar como a porta de entrada para as funções, gerenciando requisições HTTP.", "Armazenar o código-fonte das funções e gerenciar suas versões.", "Monitorar as execuções das funções e coletar métricas de desempenho."], answer: "Atuar como a porta de entrada para as funções, gerenciando requisições HTTP." },
+                { question: "O que significa dizer que o Kubernetes tem uma arquitetura 'mestre-escravo'?", options: ["Significa que todos os nós do cluster têm as mesmas responsabilidades.", "Refere-se à arquitetura com um 'control plane' (mestre) e 'worker nodes' (escravos).", "É um modelo onde um cluster pode controlar outros clusters de forma hierárquica.", "É um termo obsoleto que não se aplica à arquitetura moderna do Kubernetes."], answer: "Refere-se à arquitetura com um 'control plane' (mestre) e 'worker nodes' (escravos)." },
+                { question: "Qual o objetivo do AWS Amplify?", options: ["Fornecer um serviço de orquestração de contêineres baseado em Kubernetes.", "Oferecer uma plataforma BaaS para simplificar o desenvolvimento de backends.", "Gerenciar a infraestrutura de rede de uma VPC de forma automatizada.", "Executar testes de carga em aplicações web para verificar sua escalabilidade."], answer: "Oferecer uma plataforma BaaS para simplificar o desenvolvimento de backends." },
+                { question: "Por que o 'isolamento' é uma característica importante dos contêineres?", options: ["Para permitir que contêineres diferentes compartilhem o mesmo sistema de arquivos.", "Para garantir que um contêiner não possa acessar ou interferir nos processos de outro.", "Para que todos os contêineres em um host executem como um único processo.", "Para facilitar a comunicação direta entre todos os contêineres sem restrições."], answer: "Para garantir que um contêiner não possa acessar ou interferir nos processos de outro." },
+                { question: "Qual a relação entre DevOps e o 'time-to-market'?", options: ["As práticas DevOps aumentam o 'time-to-market' ao adicionar mais etapas manuais.", "O DevOps visa reduzir o 'time-to-market' automatizando a entrega de software.", "Não há relação direta entre as práticas DevOps e o tempo de lançamento.", "O 'time-to-market' refere-se ao tempo de resposta da aplicação, otimizado pelo DevOps."], answer: "O DevOps visa reduzir o 'time-to-market' automatizando a entrega de software." },
+                { question: "O que é 'orquestração' no contexto da nuvem?", options: ["A configuração manual de cada servidor individualmente para garantir o controle.", "A coordenação e o gerenciamento automatizado de sistemas e serviços complexos.", "A prática de usar um único serviço de nuvem para todas as necessidades da aplicação.", "O processo de migrar uma aplicação de um ambiente on-premises para a nuvem."], answer: "A coordenação e o gerenciamento automatizado de sistemas e serviços complexos." }
+            ],
+            university: [
+                { question: "Como o modelo de cobrança 'pay-per-use' do Serverless alinha os custos da nuvem ao valor de negócio?", options: ["Garantindo um custo fixo mensal, o que facilita o planejamento orçamentário da empresa.", "Cobrando apenas quando o código está em execução, eliminando custos por tempo ocioso.", "Baseando o custo no número de servidores provisionados, independentemente do tráfego.", "Exigindo contratos de longo prazo que oferecem descontos progressivos com o uso."], answer: "Cobrando apenas quando o código está em execução, eliminando custos por tempo ocioso." },
+                { question: "Qual a principal trade-off ao escolher entre GKE Autopilot e AKS com Node Pools?", options: ["O Autopilot oferece controle granular sobre os nós, enquanto o AKS abstrai a infraestrutura.", "O GKE Autopilot oferece automação máxima, enquanto Node Pools oferecem mais controle.", "O AKS com Node Pools tem um modelo operacional serverless, ao contrário do Autopilot.", "O Autopilot é mais adequado para aplicações com estado, e o AKS para as sem estado."], answer: "O GKE Autopilot oferece automação máxima, enquanto Node Pools oferecem mais controle." },
+                { question: "Por que a 'descoberta de serviço' é um desafio que o Kubernetes resolve nativamente?", options: ["Porque os microsserviços têm IPs fixos, e o Kubernetes os mapeia para nomes DNS.", "O Kubernetes atribui IPs dinâmicos aos pods e usa um objeto 'Service' para um acesso estável.", "O Kubernetes exige que cada serviço conheça previamente o endereço IP dos outros.", "Este não é um desafio real, pois os pods se comunicam usando broadcast na rede."], answer: "O Kubernetes atribui IPs dinâmicos aos pods e usa um objeto 'Service' para um acesso estável." },
+                { question: "O que é 'GitOps' e como ele aprimora as práticas de DevOps?", options: ["É uma prática onde o Git é usado apenas para o código, e a infraestrutura é gerenciada via UI.", "Um paradigma onde o Git é a fonte da verdade para o código e a infraestrutura.", "É o uso de uma interface gráfica do Git para realizar implantações manuais no cluster.", "Uma metodologia que substitui o CI/CD, focando apenas na automação da infraestrutura."], answer: "Um paradigma onde o Git é a fonte da verdade para o código e a infraestrutura." },
+                { question: "Qual o papel do 'Controller Manager' no Control Plane do Kubernetes?", options: ["Agendar os pods nos nós com base nos recursos disponíveis e nas restrições.", "Ser o ponto de entrada da API que valida e processa todas as requisições.", "Executar processos que reconciliam o estado atual com o estado desejado.", "Armazenar de forma confiável todo o estado do cluster no banco de dados."], answer: "Executar processos que reconciliam o estado atual com o estado desejado." },
+                { question: "O que é o conceito de 'configuration drift' e como a IaC ajuda a eliminá-lo?", options: ["É a melhoria contínua da configuração, que é o objetivo principal da IaC.", "São as divergências entre ambientes, que a IaC evita ao permitir a repetibilidade.", "É um desvio no código da aplicação que causa falhas na infraestrutura.", "Refere-se à mudança de provedor de nuvem, um processo que a IaC não gerencia."], answer: "São as divergências entre ambientes, que a IaC evita ao permitir a repetibilidade." },
+                { question: "Qual a diferença entre 'Backend as a Service' (BaaS) e 'Function as a Service' (FaaS)?", options: ["BaaS é a parte de computação, enquanto FaaS fornece funcionalidades prontas.", "FaaS permite executar código, enquanto BaaS oferece serviços prontos como autenticação.", "Não há diferença, são termos intercambiáveis para a mesma tecnologia serverless.", "BaaS é para aplicações com estado, e FaaS para aplicações sem estado."], answer: "FaaS permite executar código, enquanto BaaS oferece serviços prontos como autenticação." },
+                { question: "Qual a principal filosofia por trás da estratégia de implantação 'Canary'?", options: ["Substituir completamente a versão antiga pela nova de uma só vez.", "Manter dois ambientes de produção idênticos e alternar o tráfego.", "Liberar uma nova versão para um pequeno subconjunto de usuários primeiro.", "Realizar a implantação da nova versão apenas durante a noite."], answer: "Liberar uma nova versão para um pequeno subconjunto de usuários primeiro." },
+                { question: "Como o EKS garante alta disponibilidade do Control Plane?", options: ["Executando todos os componentes do control plane em uma única e potente instância EC2.", "Distribuindo automaticamente o plano de controle por múltiplas Zonas de Disponibilidade.", "Exigindo que o usuário configure manualmente um cluster de failover em outra região.", "Utilizando o AWS Lambda para reiniciar os componentes do control plane em caso de falha."], answer: "Distribuindo automaticamente o plano de controle por múltiplas Zonas de Disponibilidade." },
+                { question: "O que é o problema de 'Denial of Wallet' no contexto Serverless?", options: ["Uma falha de segurança que permite o roubo de credenciais de pagamento da conta.", "A recusa do provedor em processar o pagamento, bloqueando os serviços.", "Uma fatura inesperadamente alta devido a um pico de invocações de funções.", "A incapacidade da plataforma de escalar, resultando em perda de receita."], answer: "Uma fatura inesperadamente alta devido a um pico de invocações de funções." },
+                { question: "A extensibilidade do Kubernetes via 'Operators' o transforma em quê?", options: ["Um substituto direto para as plataformas FaaS, tornando o serverless obsoleto.", "Apenas um orquestrador de contêineres, focado em agendamento de pods.", "Um plano de controle universal e orientado por API para a infraestrutura.", "Um sistema operacional de data center que substitui o kernel do Linux."], answer: "Um plano de controle universal e orientado por API para a infraestrutura." },
+                { question: "Qual a diferença entre a escalabilidade no Kubernetes e a escalabilidade no Serverless (FaaS)?", options: ["O Kubernetes escala de zero instantaneamente, enquanto o Serverless tem um tempo de reação.", "O Serverless escala de zero automaticamente, enquanto o Kubernetes reage a regras.", "Ambos os modelos escalam da mesma forma, adicionando instâncias de VM.", "O autoescalonamento do Kubernetes é mais eficiente para cargas esporádicas."], answer: "O Serverless escala de zero automaticamente, enquanto o Kubernetes reage a regras." },
+                { question: "Por que a imutabilidade dos contêineres é crucial para a confiabilidade em CI/CD?", options: ["Porque permite que desenvolvedores apliquem patches em contêineres em produção.", "Porque garante que cada implantação seja consistente, simplificando rollbacks.", "Porque contêineres imutáveis consomem menos recursos de CPU e memória.", "Porque impede que os contêineres sejam excluídos acidentalmente do registro."], answer: "Porque garante que cada implantação seja consistente, simplificando rollbacks." },
+                { question: "Qual a implicação da arquitetura do control plane do EKS ser em uma VPC separada e gerenciada pela AWS?", options: ["Reduz a segurança, pois a comunicação entre o control plane e os nós é pública.", "Aumenta a sobrecarga operacional, pois o cliente precisa gerenciar duas VPCs.", "Melhora a segurança e a resiliência, isolando o cérebro do cluster.", "Impede o uso de ferramentas de IaC para provisionar os nós de trabalho."], answer: "Melhora a segurança e a resiliência, isolando o cérebro do cluster." },
+                { question: "O que o princípio de 'least privilege' (menor privilégio) significa no contexto do AWS IAM?", options: ["Atribuir permissões de administrador a todos os usuários para agilizar o desenvolvimento.", "Conceder apenas as permissões mínimas necessárias para uma tarefa ser executada.", "Utilizar uma única política de permissões para todos os usuários e serviços da conta.", "Remover todas as permissões de acesso e concedê-las manualmente quando solicitado."], answer: "Conceder apenas as permissões mínimas necessárias para uma tarefa ser executada." },
+                { question: "Como o Amazon RDS simplifica o gerenciamento de um banco de dados relacional?", options: ["Permitindo que o usuário instale e configure o software do banco de dados em uma instância EC2.", "Automatizando tarefas como provisionamento, aplicação de patches, e backups.", "Oferecendo uma interface de linha de comando para executar consultas SQL complexas.", "Fornecendo um serviço de banco de dados NoSQL otimizado para escalabilidade horizontal."], answer: "Automatizando tarefas como provisionamento, aplicação de patches, e backups." },
+                { question: "Qual dos seguintes é um desafio de monitoramento específico de arquiteturas de microsserviços?", options: ["A facilidade de ter todos os logs da aplicação consolidados em um único arquivo.", "A dificuldade de rastrear uma única requisição que passa por múltiplos serviços.", "A previsibilidade do desempenho, já que todos os serviços escalam juntos.", "A baixa quantidade de métricas geradas, dificultando a análise de tendências."], answer: "A dificuldade de rastrear uma única requisição que passa por múltiplos serviços." },
+                { question: "Por que um 'Service' do Kubernetes é essencial para aplicações com estado?", options: ["Porque ele garante que os dados da aplicação sejam apagados após cada reinicialização do pod.", "Porque ele fornece um ponto de acesso de rede estável, mesmo que os pods sejam recriados.", "Porque ele impede que mais de uma réplica da aplicação seja executada ao mesmo tempo.", "Porque ele gerencia o provisionamento de armazenamento persistente para os pods."], answer: "Porque ele fornece um ponto de acesso de rede estável, mesmo que os pods sejam recriados." },
+                { question: "Qual a relação entre o Cloud Native Computing Foundation (CNCF) e o Kubernetes?", options: ["A CNCF é uma empresa concorrente que desenvolveu uma alternativa ao Kubernetes.", "O Kubernetes foi criado pela CNCF e doado ao Google para manutenção.", "A CNCF é uma fundação que hospeda e mantém o projeto Kubernetes.", "O Kubernetes é um padrão fechado, sem relação com a CNCF ou o código aberto."], answer: "A CNCF é uma fundação que hospeda e mantém o projeto Kubernetes." },
+                { question: "O que diferencia a abordagem de 'self-managed nodes' da de 'managed node groups' no EKS?", options: ["Nos 'self-managed', a AWS gerencia o ciclo de vida das instâncias, e nos 'managed', o usuário.", "Nos 'managed', a AWS automatiza o provisionamento e ciclo de vida das instâncias EC2.", "Os 'self-managed nodes' são uma opção serverless, enquanto os 'managed' não são.", "Não há diferença funcional, apenas uma diferença no modelo de cobrança."], answer: "Nos 'managed', a AWS automatiza o provisionamento e ciclo de vida das instâncias EC2." },
+                { question: "Qual dos seguintes é um exemplo de um gatilho (trigger) para uma função AWS Lambda?", options: ["Uma conexão SSH direta a uma instância EC2.", "Um upload de arquivo em um bucket S3.", "A criação manual de um volume EBS.", "Uma consulta SQL executada em um banco de dados RDS."], answer: "Um upload de arquivo em um bucket S3." },
+                { question: "O que o Azure Application Insights fornece para o Azure Functions?", options: ["Um registro de imagens de contêiner para armazenar as funções.", "Autenticação e autorização para proteger os endpoints HTTP.", "Monitoramento e análise de desempenho das execuções das funções.", "Um gateway de API para gerenciar e expor as funções para a internet."], answer: "Monitoramento e análise de desempenho das execuções das funções." },
+                { question: "Por que a consistência é um benefício chave da IaC?", options: ["Porque permite que cada ambiente seja configurado de forma diferente e otimizada.", "Porque elimina o 'configuration drift' ao definir a infraestrutura em código.", "Porque requer que todas as alterações de infraestrutura sejam feitas manualmente.", "Porque torna o processo de provisionamento mais lento e, portanto, mais seguro."], answer: "Porque elimina o 'configuration drift' ao definir a infraestrutura em código." },
+                { question: "No ciclo de CI/CD, onde a construção de uma imagem de contêiner normalmente ocorre?", options: ["Na fase de Integração Contínua (CI), após a compilação e testes.", "Na fase de Implantação Contínua (CD), diretamente no ambiente de produção.", "Manualmente pelo desenvolvedor antes de enviar o código para o repositório.", "A imagem não é construída, o código-fonte é copiado para os contêineres."], answer: "Na fase de Integração Contínua (CI), após a compilação e testes." },
+                { question: "Qual a principal vantagem de usar o Google Firebase como BaaS?", options: ["Oferece controle total sobre a infraestrutura subjacente, incluindo os servidores.", "Fornece funcionalidades de backend prontas, acelerando o desenvolvimento.", "É otimizado para executar código de computação intensiva em resposta a eventos.", "Requer que o desenvolvedor construa e gerencie seu próprio sistema de autenticação."], answer: "Fornece funcionalidades de backend prontas, acelerando o desenvolvimento." },
+                { question: "O que diferencia o modelo de preços do AWS Lambda do modelo do EC2?", options: ["O Lambda cobra por hora, mesmo que ocioso, enquanto o EC2 cobra por execução.", "O EC2 cobra por segundo/hora, enquanto o Lambda cobra por invocação e tempo de execução.", "Ambos têm exatamente o mesmo modelo de cobrança baseado em instâncias.", "O Lambda tem um custo fixo mensal, e o EC2 tem um custo variável."], answer: "O EC2 cobra por segundo/hora, enquanto o Lambda cobra por invocação e tempo de execução." },
+                { question: "Qual a função do 'Horizontal Pod Autoscaler' (HPA) no Kubernetes?", options: ["Ajustar o número de nós no cluster com base na demanda geral.", "Aumentar ou diminuir o número de réplicas de um pod com base em métricas.", "Ajustar a quantidade de CPU e memória alocada para um único pod.", "Reiniciar pods que falharam em um nó diferente e saudável do cluster."], answer: "Aumentar ou diminuir o número de réplicas de um pod com base em métricas." },
+                { question: "O que é 'orquestração' no contexto de contêineres?", options: ["O processo de escrever o Dockerfile para construir uma imagem de contêiner.", "A automação do gerenciamento, escalabilidade e ciclo de vida de contêineres.", "A instalação do Docker ou outro container runtime em um servidor.", "A conversão de uma aplicação monolítica em uma arquitetura de microsserviços."], answer: "A automação do gerenciamento, escalabilidade e ciclo de vida de contêineres." },
+                { question: "Qual a principal diferença entre EKS e ECS da AWS?", options: ["ECS é baseado em Kubernetes, enquanto EKS é uma tecnologia proprietária.", "EKS é baseado em Kubernetes, enquanto ECS é uma tecnologia proprietária.", "Ambos são baseados em Kubernetes, mas o ECS é mais antigo e menos robusto.", "ECS é para aplicações web, e EKS é para processamento de dados."], answer: "EKS é baseado em Kubernetes, enquanto ECS é uma tecnologia proprietária." },
+                { question: "Qual dos seguintes NÃO é um componente do Control Plane do Kubernetes?", options: ["API Server", "etcd", "Scheduler", "Kubelet"], answer: "Kubelet" },
+                { question: "Qual o benefício de usar o Terraform para IaC em um ambiente multi-cloud?", options: ["Ele é uma ferramenta exclusiva da AWS, o que garante melhor integração.", "Sua sintaxe declarativa é agnóstica de nuvem, permitindo gerenciar múltiplos provedores.", "Ele compila o código da infraestrutura em binários otimizados para cada nuvem.", "Ele não armazena um arquivo de estado, o que simplifica o trabalho em equipe."], answer: "Sua sintaxe declarativa é agnóstica de nuvem, permitindo gerenciar múltiplos provedores." },
+                { question: "O que o AWS CloudFormation permite que os usuários façam?", options: ["Executar contêineres Docker de forma serverless, sem gerenciar servidores.", "Modelar e provisionar recursos da infraestrutura da AWS de forma declarativa.", "Monitorar a saúde das aplicações, enviando alertas em caso de falhas.", "Oferecer um banco de dados NoSQL totalmente gerenciado e altamente escalável."], answer: "Modelar e provisionar recursos da infraestrutura da AWS de forma declarativa." },
+                { question: "No modelo de responsabilidade compartilhada, qual é a responsabilidade do cliente na nuvem?", options: ["A segurança dos data centers, incluindo o controle de acesso físico.", "A manutenção do hardware de rede, como switches e roteadores.", "A segurança 'NA' nuvem, incluindo a configuração de firewalls e dados.", "A aplicação de patches de segurança no hipervisor das máquinas virtuais."], answer: "A segurança 'NA' nuvem, incluindo a configuração de firewalls e dados." },
+                { question: "O que é um 'Dockerfile'?", options: ["Um arquivo de manifesto YAML para implantar aplicações no Kubernetes.", "Um script de texto com instruções para construir uma imagem de contêiner.", "Um arquivo de configuração que define as regras de um Security Group.", "Um documento que descreve a arquitetura de uma aplicação em nuvem."], answer: "Um script de texto com instruções para construir uma imagem de contêiner." },
+                { question: "O que é 'observabilidade' em sistemas nativos da nuvem?", options: ["A capacidade de inferir o estado interno de um sistema a partir de seus outputs.", "A prática de ocultar os logs e métricas da aplicação por razões de segurança.", "A garantia de que apenas usuários autorizados possam observar o sistema.", "A otimização do sistema para que ele consuma o mínimo de recursos."], answer: "A capacidade de inferir o estado interno de um sistema a partir de seus outputs." },
+                { question: "Qual a função do 'API Gateway' em uma arquitetura serverless?", options: ["Executar o código das funções Lambda em um ambiente seguro e isolado.", "Atuar como a porta de entrada para as funções, gerenciando requisições HTTP.", "Armazenar o código-fonte das funções e gerenciar suas diferentes versões.", "Monitorar as execuções das funções e coletar métricas de desempenho."], answer: "Atuar como a porta de entrada para as funções, gerenciando requisições HTTP." },
+                { question: "O que significa a arquitetura 'mestre-escravo' do Kubernetes?", options: ["Que todos os nós do cluster têm as mesmas responsabilidades de gerenciamento.", "A arquitetura com um 'control plane' (mestre) e 'worker nodes' (escravos).", "Um modelo onde um cluster pode controlar outros clusters de forma hierárquica.", "Um termo obsoleto que não se aplica à arquitetura moderna da plataforma."], answer: "A arquitetura com um 'control plane' (mestre) e 'worker nodes' (escravos)." },
+                { question: "Qual o objetivo do AWS Amplify?", options: ["Fornecer um serviço de orquestração de contêineres baseado em Kubernetes.", "Oferecer uma plataforma BaaS para simplificar o desenvolvimento de backends.", "Gerenciar a infraestrutura de rede de uma VPC de forma automatizada.", "Executar testes de carga em aplicações web para verificar sua escalabilidade."], answer: "Oferecer uma plataforma BaaS para simplificar o desenvolvimento de backends." },
+                { question: "Por que o 'isolamento' é uma característica importante dos contêineres?", options: ["Para permitir que contêineres diferentes compartilhem o mesmo sistema de arquivos.", "Para garantir que um contêiner não possa interferir nos processos de outro.", "Para que todos os contêineres em um host executem como um único processo.", "Para facilitar a comunicação direta entre todos os contêineres sem restrições."], answer: "Para garantir que um contêiner não possa interferir nos processos de outro." },
+                { question: "Qual a relação entre DevOps e o 'time-to-market'?", options: ["As práticas DevOps aumentam o 'time-to-market' ao adicionar mais etapas manuais.", "O DevOps visa reduzir o 'time-to-market' automatizando a entrega de software.", "Não há relação direta entre as práticas DevOps e o tempo de lançamento.", "O 'time-to-market' refere-se ao tempo de resposta da aplicação, otimizado pelo DevOps."], answer: "O DevOps visa reduzir o 'time-to-market' automatizando a entrega de software." },
+                { question: "O que é 'orquestração' no contexto da nuvem?", options: ["A configuração manual de cada servidor individualmente para garantir o controle.", "A coordenação e o gerenciamento automatizado de sistemas e serviços complexos.", "A prática de usar um único serviço de nuvem para todas as necessidades da aplicação.", "O processo de migrar uma aplicação de um ambiente on-premises para a nuvem."], answer: "A coordenação e o gerenciamento automatizado de sistemas e serviços complexos." },
+                { question: "O que o Amazon ECR (Elastic Container Registry) fornece?", options: ["Um serviço de computação serverless para executar contêineres sem gerenciar servidores.", "Um registro de imagens de contêiner privado, seguro e gerenciado.", "Um orquestrador de contêineres baseado no projeto de código aberto Kubernetes.", "Um serviço de monitoramento para coletar métricas de clusters de contêineres."], answer: "Um registro de imagens de contêiner privado, seguro e gerenciado." },
+                { question: "Qual o principal caso de uso para uma arquitetura serverless?", options: ["Aplicações monolíticas com processos de longa duração e estado persistente.", "Bancos de dados relacionais que exigem alta performance e baixa latência.", "Arquiteturas orientadas a eventos e processamento de dados em tempo real.", "Gerenciamento de clusters de contêineres com requisitos de rede complexos."], answer: "Arquiteturas orientadas a eventos e processamento de dados em tempo real." },
+                { question: "Qual a principal vantagem do GKE sobre o AKS e EKS em termos de autoescalonamento?", options: ["O GKE é o único que suporta o escalonamento horizontal de pods (HPA).", "O GKE oferece um autoescalonamento de quatro vias, incluindo o vertical de pods (VPA).", "O AKS e o EKS não possuem nenhum tipo de capacidade de autoescalonamento.", "O autoescalonamento do GKE é mais lento, porém mais preciso que o dos concorrentes."], answer: "O GKE oferece um autoescalonamento de quatro vias, incluindo o vertical de pods (VPA)." },
+                { question: "Como a AWS cobra pelo control plane do EKS?", options: ["É totalmente gratuito, a cobrança é apenas pelos nós de trabalho.", "Pago por hora por cluster, garantindo alta disponibilidade por padrão.", "A cobrança é baseada no número de pods em execução no cluster.", "Existe um pagamento único na criação do cluster, sem custos recorrentes."], answer: "Pago por hora por cluster, garantindo alta disponibilidade por padrão." },
+                { question: "O que é um 'release channel' no GKE?", options: ["Um canal de comunicação para suporte técnico com a equipe do Google.", "Uma funcionalidade que permite atualizações automáticas controladas do cluster.", "Um tipo de rede virtual para conectar clusters GKE em diferentes regiões.", "Uma política de segurança que restringe o acesso ao control plane do cluster."], answer: "Uma funcionalidade que permite atualizações automáticas controladas do cluster." }
+            ]
+        };
+
+        // --- LÓGICA DO JOGO ---
+        let questionPools = {};
+        let currentDifficulty = '';
+        let currentQuestions = [];
+        let score = 0;
+        let questionIndex = 0;
+        let selectedOption = null;
+        const totalGameQuestions = 15;
+
+        const allScreens = ['start-screen', 'game-screen', 'end-screen', 'history-screen'];
+        const quizContainer = document.getElementById('quiz-container');
+        const animationOverlay = document.getElementById('animation-overlay');
+        const quizTitleEl = document.getElementById('quiz-title');
+        const currentQuestionEl = document.getElementById('current-question');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsAreaEl = document.getElementById('options-area');
+        const confirmButton = document.getElementById('confirm-button');
+        const nextButton = document.getElementById('next-button');
+        const finalScoreEl = document.getElementById('final-score');
+        const historyLogContainerEl = document.getElementById('history-log-container');
+        
+        const difficultyMap = {
+            medium: { name: 'Nível Médio', color: 'text-blue-500', titleClass: 'text-blue-600 dark:text-blue-400' },
+            hard: { name: 'Nível Difícil', color: 'text-amber-500', titleClass: 'text-amber-500 dark:text-amber-400' },
+            university: { name: 'Hard (Univ.)', color: 'text-red-500', titleClass: 'text-red-600 dark:text-red-400' }
+        };
+
+        let correctSynth, incorrectSynth;
+
+        function setupAudio() {
+            correctSynth = new Tone.PolySynth(Tone.Synth).toDestination();
+            incorrectSynth = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, release: 0.2 } }).toDestination();
+        }
+        function playCorrectSound() { if(correctSynth) correctSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n", Tone.now()); }
+        function playIncorrectSound() { if(incorrectSynth) incorrectSynth.triggerAttackRelease("C3", "8n", Tone.now()); }
+
+        function triggerSuccessAnimation() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                animationOverlay.appendChild(confetti);
+            }
+            setTimeout(() => animationOverlay.innerHTML = '', 5000);
+        }
+        function triggerFailureAnimation() {
+            quizContainer.classList.add('shake');
+            animationOverlay.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-8xl opacity-50 animate-ping">😟</div>';
+            setTimeout(() => {
+                quizContainer.classList.remove('shake');
+                animationOverlay.innerHTML = '';
+            }, 600);
+        }
+
+        function showScreen(screenId) {
+            allScreens.forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+        function showStartScreen() { showScreen('start-screen'); }
+        function showHistoryScreen() { 
+            showScreen('history-screen');
+            showHistoryTab('medium');
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        function initializePools() {
+            Object.keys(questions).forEach(level => {
+                questionPools[level] = [...questions[level]];
+                shuffleArray(questionPools[level]);
+            });
+        }
+
+        function startGame(difficulty) {
+            if (Tone.context.state !== 'running') {
+                Tone.start().then(setupAudio);
+            }
+            currentDifficulty = difficulty;
+            
+            if (!questionPools[difficulty] || questionPools[difficulty].length < totalGameQuestions) {
+                initializePools();
+            }
+            
+            score = 0;
+            questionIndex = 0;
+            currentQuestions = questionPools[difficulty].splice(0, totalGameQuestions);
+            
+            showScreen('game-screen');
+            const levelInfo = difficultyMap[difficulty];
+            quizTitleEl.textContent = levelInfo.name;
+            quizTitleEl.className = `text-xl font-bold ${levelInfo.titleClass}`;
+            totalQuestionsEl.textContent = totalGameQuestions;
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            selectedOption = null;
+            confirmButton.disabled = true;
+            confirmButton.classList.remove('hidden');
+            nextButton.classList.add('hidden');
+            const current = currentQuestions[questionIndex];
+            currentQuestionEl.textContent = questionIndex + 1;
+            questionTextEl.textContent = current.question;
+            optionsAreaEl.innerHTML = '';
+            
+            const shuffledOptions = [...current.options];
+            shuffleArray(shuffledOptions);
+
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                // CORREÇÃO: Adicionado foco visível para acessibilidade
+                button.className = 'quiz-option w-full p-4 border-2 border-slate-300 dark:border-slate-600 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800';
+                button.onclick = () => selectOption(button, option);
+                optionsAreaEl.appendChild(button);
+            });
+        }
+
+        function selectOption(button, option) {
+            optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            selectedOption = option;
+            confirmButton.disabled = false;
+        }
+        
+        function confirmAnswer() {
+            if (selectedOption === null) return;
+            const isCorrect = selectedOption === currentQuestions[questionIndex].answer;
+            optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === currentQuestions[questionIndex].answer) btn.classList.add('correct');
+                if (btn.textContent === selectedOption && !isCorrect) btn.classList.add('incorrect');
+            });
+
+            if (isCorrect) {
+                score++;
+                playCorrectSound();
+                triggerSuccessAnimation();
+            } else {
+                playIncorrectSound();
+                triggerFailureAnimation();
+            }
+
+            confirmButton.classList.add('hidden');
+            nextButton.textContent = (questionIndex < totalGameQuestions - 1) ? "Próxima Pergunta" : "Ver Pontuação";
+            nextButton.classList.remove('hidden');
+        }
+        
+        function nextQuestion() {
+            questionIndex++;
+            if(questionIndex < totalGameQuestions){
+                 displayQuestion();
+            } else {
+                 showEndScreen();
+            }
+        }
+        
+        function showEndScreen() {
+            saveScoreToHistory();
+            showScreen('end-screen');
+            finalScoreEl.textContent = `${score}/${totalGameQuestions}`;
+        }
+        
+        function saveScoreToHistory() {
+            const history = JSON.parse(localStorage.getItem('cloudQuizHistory_v2')) || [];
+            history.push({
+                level: currentDifficulty,
+                score: score,
+                total: totalGameQuestions,
+                date: new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
+            });
+            localStorage.setItem('cloudQuizHistory_v2', JSON.stringify(history));
+        }
+
+        function showHistoryTab(level) {
+            ['medium', 'hard', 'university'].forEach(id => document.getElementById(`tab-${id}`).classList.remove('active'));
+            document.getElementById(`tab-${level}`).classList.add('active');
+            
+            const history = JSON.parse(localStorage.getItem('cloudQuizHistory_v2')) || [];
+            const filteredHistory = history.filter(entry => entry.level === level);
+            historyLogContainerEl.innerHTML = '';
+
+            if (filteredHistory.length === 0) {
+                historyLogContainerEl.innerHTML = `<p class="text-slate-500 dark:text-slate-400 text-center p-4">Nenhuma rodada jogada neste nível.</p>`;
+                return;
+            }
+
+            filteredHistory.slice().reverse().forEach(entry => {
+                const levelInfo = difficultyMap[entry.level];
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'flex justify-between items-center text-sm p-3 bg-white dark:bg-slate-800/50 rounded-md shadow-sm';
+                entryDiv.innerHTML = `
+                        <div class="font-semibold">
+                            <span class="font-bold ${levelInfo.color}">${levelInfo.name}:</span>
+                            <span class="text-slate-800 dark:text-slate-200"> ${entry.score} de ${entry.total} pontos</span>
+                        </div>
+                        <span class="text-xs text-slate-400 dark:text-slate-500">${entry.date}</span>
+                `;
+                historyLogContainerEl.appendChild(entryDiv);
+            });
+        }
+
+        function clearHistory() {
+            if (confirm('Tem certeza de que deseja apagar todo o seu histórico de estudos? Esta ação não pode ser desfeita.')) {
+                localStorage.removeItem('cloudQuizHistory_v2');
+                const currentTab = document.querySelector('.tab-button.active')?.id.replace('tab-', '') || 'medium';
+                showHistoryTab(currentTab);
+            }
+        }
+        
+        initializePools();
+        showStartScreen();
+    </script>
+</body>
+</html>
