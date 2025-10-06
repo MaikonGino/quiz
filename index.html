@@ -19,9 +19,9 @@
     body { font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: var(--bg); color: var(--text-dark); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     .card { background: var(--card); border-radius: 16px; }
     .focus-ring:focus { box-shadow: 0 6px 18px rgba(14,165,233,.12); outline: none; border-radius: 10px; }
-    .quiz-option, .level-button, .action-button, .tab-button { transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, background-color .15s; }
+    .quiz-option, .level-button, .action-button, .tab-button, .modal-button { transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, background-color .15s, border-color .15s; cursor: pointer; }
     .quiz-option { background: #fff; border: 1px solid rgba(15,23,42,0.06); border-radius: 12px; padding: 16px; text-align:left; }
-    .quiz-option.selected { transform: translateY(-3px); border-width: 2px; box-shadow: 0 8px 20px rgba(2,6,23,0.06); }
+    .quiz-option.selected { transform: translateY(-3px); border-width: 2px; border-color: var(--accent); box-shadow: 0 8px 20px rgba(2,6,23,0.06); }
     .correct { background-color: #16a34a !important; color: white !important; border-color: #15803d !important; }
     .incorrect { background-color: #dc2626 !important; color: white !important; border-color: #b91c1c !important; }
     .confetti { position: absolute; width: 8px; height: 12px; opacity: 0.95; border-radius: 2px; will-change: transform, opacity; }
@@ -35,19 +35,28 @@
     }
     .progress { height: 8px; background: rgba(0,0,0,0.06); border-radius: 999px; overflow: hidden; }
     .progress > i { display:block; height:100%; background: linear-gradient(90deg,var(--accent),#7c3aed); width:0%; transition: width .45s ease; }
-    /* responsive */
+    
+    /* Histórico */
+    .tab-button.active { background-color: var(--accent); color: white; border-color: var(--accent); }
+    .dark .tab-button.active { background-color: var(--accent); border-color: var(--accent); }
+
+    /* Modal Styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; }
+    .modal-overlay.visible { opacity: 1; visibility: visible; }
+    .modal-content { background: var(--card); color: var(--text-dark); padding: 2rem; border-radius: 16px; width: 90%; max-width: 500px; transform: scale(0.95); transition: transform 0.3s ease; }
+    .modal-overlay.visible .modal-content { transform: scale(1); }
+
     @media (max-width:640px){
       .quiz-option { padding: 12px; font-size: 14px; }
+      .modal-content { padding: 1.5rem; }
     }
   </style>
 </head>
 <body class="min-h-screen grid place-items-center p-6">
 
   <main class="w-full max-w-3xl card shadow-xl p-6 md:p-10 relative z-10">
-    <!-- Overlay for confetti -->
     <div id="animation-overlay" class="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl"></div>
 
-    <!-- Header -->
     <header class="flex items-center justify-between mb-6">
       <div class="flex items-center gap-3">
         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 grid place-items-center text-white font-extrabold text-xl">☁️</div>
@@ -69,14 +78,13 @@
       </div>
     </header>
 
-    <!-- Start screen -->
     <section id="start-screen" class="space-y-5">
-      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Selecione o nível para começar. Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100">1</kbd> Médio · <kbd class="px-2 py-1 rounded bg-slate-100">2</kbd> Difícil · <kbd class="px-2 py-1 rounded bg-slate-100">3</kbd> Univ.</p>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Selecione o nível para começar. Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">1</kbd> Médio · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">2</kbd> Difícil · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">3</kbd> Univ.</p>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <button class="level-button focus-ring bg-white border border-slate-200 rounded-lg py-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('medium')" aria-label="Iniciar nível médio">
+        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('medium')" aria-label="Iniciar nível médio">
           <div class="flex items-center justify-between">
-            <div>
+            <div class="text-left">
               <div class="text-sm text-slate-500">Nível</div>
               <div class="text-lg font-bold">Médio</div>
             </div>
@@ -84,9 +92,9 @@
           </div>
         </button>
 
-        <button class="level-button focus-ring bg-white border border-slate-200 rounded-lg py-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('hard')" aria-label="Iniciar nível difícil">
+        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('hard')" aria-label="Iniciar nível difícil">
           <div class="flex items-center justify-between">
-            <div>
+            <div class="text-left">
               <div class="text-sm text-slate-500">Nível</div>
               <div class="text-lg font-bold">Difícil</div>
             </div>
@@ -94,9 +102,9 @@
           </div>
         </button>
 
-        <button class="level-button focus-ring bg-white border border-slate-200 rounded-lg py-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('university')" aria-label="Iniciar nível universitário">
+        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('university')" aria-label="Iniciar nível universitário">
           <div class="flex items-center justify-between">
-            <div>
+            <div class="text-left">
               <div class="text-sm text-slate-500">Nível</div>
               <div class="text-lg font-bold">Universitário</div>
             </div>
@@ -106,12 +114,11 @@
       </div>
 
       <div class="flex gap-3">
-        <button onclick="showHistoryScreen()" class="history-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold hover:bg-sky-700">Ver Histórico</button>
-        <button onclick="showAbout()" class="focus-ring px-4 py-3 rounded-lg bg-white border border-slate-200">Sobre</button>
+        <button onclick="showHistoryScreen()" class="action-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold hover:bg-sky-700">Ver Histórico</button>
+        <button onclick="showAbout()" class="action-button focus-ring px-4 py-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">Sobre</button>
       </div>
     </section>
 
-    <!-- Game screen -->
     <section id="game-screen" class="hidden space-y-4" aria-hidden="true">
       <div class="flex items-center justify-between gap-4">
         <div>
@@ -131,39 +138,37 @@
       <div id="options-area" class="grid gap-3"></div>
 
       <div class="flex items-center gap-3 mt-2">
-        <button id="confirm-button" onclick="confirmAnswer()" class="action-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold disabled:opacity-50" disabled>Confirmar</button>
+        <button id="confirm-button" onclick="confirmAnswer()" class="action-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold disabled:opacity-50 disabled:cursor-not-allowed" disabled>Confirmar</button>
         <button id="next-button" onclick="nextQuestion()" class="hidden action-button focus-ring flex-1 bg-emerald-600 text-white rounded-lg py-3 font-bold">Próxima</button>
-        <button onclick="exitGame()" class="p-3 rounded-lg border border-slate-200 hover:bg-slate-50">Sair</button>
+        <button onclick="exitGame()" class="action-button p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">Sair</button>
       </div>
 
-      <div class="text-sm text-slate-500 mt-1">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100">1</kbd>-<kbd class="px-2 py-1 rounded bg-slate-100">4</kbd> selecionar · <kbd class="px-2 py-1 rounded bg-slate-100">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100">N</kbd> próxima</div>
+      <div class="text-sm text-slate-500 mt-1">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">1</kbd>-<kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">4</kbd> selecionar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">N</kbd> próxima</div>
     </section>
 
-    <!-- End screen -->
     <section id="end-screen" class="hidden text-center space-y-4" aria-hidden="true">
       <h2 class="text-3xl font-bold">Fim da Rodada 🎉</h2>
       <p class="text-slate-600 dark:text-slate-400">Sua pontuação:</p>
       <div id="final-score" class="text-5xl font-extrabold text-sky-600"></div>
       <div class="flex gap-3">
-        <button onclick="showStartScreen()" class="flex-1 bg-white border border-slate-200 rounded-lg py-3">Voltar ao início</button>
-        <button id="replay-button" class="flex-1 bg-sky-600 text-white rounded-lg py-3">Jogar novamente</button>
+        <button onclick="showStartScreen()" class="action-button flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-3">Voltar ao início</button>
+        <button id="replay-button" class="action-button flex-1 bg-sky-600 text-white rounded-lg py-3">Jogar novamente</button>
       </div>
     </section>
 
-    <!-- History screen -->
     <section id="history-screen" class="hidden" aria-hidden="true">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Histórico de Estudos</h2>
         <div class="flex gap-2">
-          <button onclick="clearHistory()" class="text-sm text-red-500">Limpar tudo</button>
-          <button onclick="showStartScreen()" class="text-sm bg-white border border-slate-200 rounded-lg px-3 py-2">Voltar</button>
+          <button onclick="clearHistory()" class="text-sm text-red-500 hover:underline">Limpar tudo</button>
+          <button onclick="showStartScreen()" class="action-button text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">Voltar</button>
         </div>
       </div>
 
       <div class="grid md:grid-cols-3 gap-3 mb-4">
-        <button id="tab-medium" class="tab-button focus-ring rounded-lg border border-slate-200 px-3 py-2" onclick="showHistoryTab('medium')">Médio</button>
-        <button id="tab-hard" class="tab-button focus-ring rounded-lg border border-slate-200 px-3 py-2" onclick="showHistoryTab('hard')">Difícil</button>
-        <button id="tab-university" class="tab-button focus-ring rounded-lg border border-slate-200 px-3 py-2" onclick="showHistoryTab('university')">Univ.</button>
+        <button id="tab-medium" class="tab-button focus-ring rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2" onclick="showHistoryTab('medium')">Médio</button>
+        <button id="tab-hard" class="tab-button focus-ring rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2" onclick="showHistoryTab('hard')">Difícil</button>
+        <button id="tab-university" class="tab-button focus-ring rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2" onclick="showHistoryTab('university')">Univ.</button>
       </div>
 
       <div id="history-log-container" class="bg-slate-50 dark:bg-slate-900/40 p-4 rounded-lg max-h-64 overflow-y-auto"></div>
@@ -173,6 +178,14 @@
       Desenvolvido por <a href="https://portfoliomaikongino.web.app/" target="_blank" rel="noopener noreferrer" class="animated-gradient font-bold">MG Produções</a> — 2025
     </footer>
   </main>
+
+  <div id="modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content space-y-4">
+      <h3 id="modal-title" class="text-2xl font-bold"></h3>
+      <div id="modal-body" class="text-slate-600 dark:text-slate-400"></div>
+      <div id="modal-actions" class="flex gap-3 justify-end"></div>
+    </div>
+  </div>
       <script>
         const questions = {
             medium: [
@@ -328,20 +341,17 @@
                 { question: "O que é um 'release channel' no GKE?", options: ["Um canal de comunicação para suporte técnico com a equipe do Google.", "Uma funcionalidade que permite atualizações automáticas controladas do cluster.", "Um tipo de rede virtual para conectar clusters GKE em diferentes regiões.", "Uma política de segurança que restringe o acesso ao control plane do cluster."], answer: "Uma funcionalidade que permite atualizações automáticas controladas do cluster." }
             ]
         };
-       /***********************************************
-     * Estado & configurações
-     ***********************************************/
-    let pools = {};                 // shuffled pools per difficulty
+      let pools = {};                  // shuffled pools per difficulty
     let currentDifficulty = null;
     let currentQuestions = [];
     let currentIndex = 0;
     let selectedOption = null;
     let currentScore = 0;
-    const DEFAULT_TOTAL = 15;       // padrão por rodada (será adaptado se o pool for menor)
+    const DEFAULT_TOTAL = 15;        // padrão por rodada (será adaptado se o pool for menor)
     const classMap = {
       medium: { name: 'Nível Médio', titleClass: 'text-blue-600 dark:text-blue-400' },
       hard: { name: 'Nível Difícil', titleClass: 'text-amber-500 dark:text-amber-400' },
-      university: { name: 'Hard (Univ.)', titleClass: 'text-red-600 dark:text-red-400' }
+      university: { name: 'Nível Universitário', titleClass: 'text-red-600 dark:text-red-400' }
     };
 
     /***********************************************
@@ -370,6 +380,13 @@
     const soundToggle = document.getElementById('sound-toggle');
     const soundOnIcon = document.getElementById('icon-sound-on');
     const soundOffIcon = document.getElementById('icon-sound-off');
+    
+    // Modal elements
+    const modalEl = document.getElementById('modal');
+    const modalTitleEl = document.getElementById('modal-title');
+    const modalBodyEl = document.getElementById('modal-body');
+    const modalActionsEl = document.getElementById('modal-actions');
+
 
     /***********************************************
      * Áudio (Tone.js)
@@ -381,9 +398,11 @@
 
     function setupAudio() {
       if (synthClick) return;
-      synthClick = new Tone.Synth({ envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.1 } }).toDestination();
-      synthCorrect = new Tone.PolySynth(Tone.Synth).toDestination();
-      synthIncorrect = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, release: 0.2 } }).toDestination();
+      try {
+        synthClick = new Tone.Synth({ envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.1 } }).toDestination();
+        synthCorrect = new Tone.PolySynth(Tone.Synth).toDestination();
+        synthIncorrect = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, release: 0.2 } }).toDestination();
+      } catch(e) { console.error("Tone.js failed to initialize:", e); }
     }
     function setSound(on) {
       soundEnabled = on;
@@ -394,9 +413,9 @@
     }
     setSound(soundEnabled);
 
-    function playClick() { if (!soundEnabled) return; try { synthClick.triggerAttackRelease('E4', '8n'); } catch(e){} }
-    function playCorrect() { if (!soundEnabled) return; try { synthCorrect.triggerAttackRelease(["C4","E4","G4"], "8n"); } catch(e){} }
-    function playWrong() { if (!soundEnabled) return; try { synthIncorrect.triggerAttackRelease("C3", "8n"); } catch(e){} }
+    function playClick() { if (!soundEnabled || !synthClick) return; try { synthClick.triggerAttackRelease('E4', '8n'); } catch(e){} }
+    function playCorrect() { if (!soundEnabled || !synthCorrect) return; try { synthCorrect.triggerAttackRelease(["C4","E4","G4"], "8n"); } catch(e){} }
+    function playWrong() { if (!soundEnabled || !synthIncorrect) return; try { synthIncorrect.triggerAttackRelease("C3", "8n"); } catch(e){} }
 
     /***********************************************
      * Theme
@@ -453,21 +472,18 @@
     /***********************************************
      * Fluxo do jogo
      ***********************************************/
-    function showStartScreen() {
-      startScreen.classList.remove('hidden');
-      gameScreen.classList.add('hidden');
-      endScreen.classList.add('hidden');
-      historyScreen.classList.add('hidden');
+    function showScreen(screenToShow) {
+        [startScreen, gameScreen, endScreen, historyScreen].forEach(screen => {
+            screen.classList.toggle('hidden', screen !== screenToShow);
+            screen.setAttribute('aria-hidden', screen !== screenToShow);
+        });
     }
+
+    function showStartScreen() { showScreen(startScreen); }
+
     function showHistoryScreen() {
-      startScreen.classList.add('hidden');
-      gameScreen.classList.add('hidden');
-      endScreen.classList.add('hidden');
-      historyScreen.classList.remove('hidden');
-      showHistoryTab('medium');
-    }
-    function showAbout() {
-      alert("Quiz de Computação em Nuvem II — desenvolvido por MG Produções.\nAtalhos: 1-4 selecionar · Enter confirmar · N próxima · Esc sair.");
+        showScreen(historyScreen);
+        showHistoryTab('medium');
     }
 
     function startGame(level) {
@@ -479,7 +495,6 @@
       }
 
       currentDifficulty = level;
-      // ensure pool has enough; re-init if necessary
       if (!pools[level] || pools[level].length < 1) initPools();
 
       currentScore = 0;
@@ -487,19 +502,13 @@
 
       const poolLen = pools[level].length;
       const total = Math.min(DEFAULT_TOTAL, poolLen);
-      // take first total questions (already shuffled)
       currentQuestions = pools[level].slice(0, total);
 
-      // prepare UI
       quizTitleEl.textContent = classMap[level].name;
       quizTitleEl.className = `text-xl font-bold ${classMap[level].titleClass}`;
       updateProgress();
 
-      startScreen.classList.add('hidden');
-      gameScreen.classList.remove('hidden');
-      endScreen.classList.add('hidden');
-      historyScreen.classList.add('hidden');
-
+      showScreen(gameScreen);
       renderQuestion();
     }
 
@@ -512,22 +521,20 @@
       const q = currentQuestions[currentIndex];
       questionTextEl.textContent = q.question;
 
-      // shuffle options for display
       const opts = [...q.options];
       shuffle(opts);
 
       optionsAreaEl.innerHTML = '';
       opts.forEach((opt, idx) => {
         const btn = document.createElement('button');
-        btn.className = 'quiz-option focus-ring w-full';
+        btn.className = 'quiz-option focus-ring w-full dark:bg-slate-800 dark:border-slate-700';
         btn.setAttribute('type','button');
+        btn.dataset.option = opt; // Robust way to store option value
         btn.innerHTML = `<div class="flex justify-between items-center"><div><strong>${String.fromCharCode(65+idx)}.</strong> <span class="ml-2">${opt}</span></div><div class="text-xs text-slate-400">Pressione ${idx+1}</div></div>`;
         btn.addEventListener('click', () => selectOption(btn, opt));
-        btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectOption(btn,opt); } });
         optionsAreaEl.appendChild(btn);
       });
 
-      // focus first option for accessibility
       setTimeout(()=> { optionsAreaEl.querySelector('button')?.focus?.(); }, 120);
       updateProgress();
     }
@@ -537,19 +544,21 @@
       button.classList.add('selected');
       selectedOption = option;
       confirmButton.disabled = false;
-      if (soundEnabled) playClick();
+      playClick();
     }
 
     function confirmAnswer() {
       if (selectedOption === null) return;
       const q = currentQuestions[currentIndex];
       const isCorrect = selectedOption === q.answer;
+      
       optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => {
-        const txt = btn.textContent.trim();
-        // compare by full option text - safer to check contains answer
-        if (txt.includes(q.answer)) btn.classList.add('correct');
-        if (txt.includes(selectedOption) && !isCorrect) { btn.classList.add('incorrect'); btn.classList.add('shake'); }
         btn.disabled = true;
+        if (btn.dataset.option === q.answer) {
+          btn.classList.add('correct');
+        } else if (btn.dataset.option === selectedOption) {
+          btn.classList.add('incorrect', 'shake');
+        }
       });
 
       if (isCorrect) {
@@ -558,14 +567,12 @@
         launchConfetti(20);
       } else {
         playWrong();
-        // subtle failure animation
         triggerFailure();
       }
 
       confirmButton.classList.add('hidden');
       nextButton.textContent = (currentIndex < currentQuestions.length - 1) ? "Próxima Pergunta" : "Ver Pontuação";
       nextButton.classList.remove('hidden');
-      savePartialUIState(); // optional
       updateProgress();
     }
 
@@ -582,16 +589,19 @@
       saveScoreToHistory(currentDifficulty, currentScore, currentQuestions.length);
       finalScoreEl.textContent = `${currentScore} / ${currentQuestions.length}`;
       replayButton.onclick = () => startGame(currentDifficulty);
-      gameScreen.classList.add('hidden');
-      endScreen.classList.remove('hidden');
-      // celebratory if >60%
+      showScreen(endScreen);
       if (currentScore / currentQuestions.length >= 0.6) launchConfetti(40);
     }
 
     function exitGame() {
-      if (confirm('Deseja realmente sair da rodada atual? Progresso será perdido.')) {
-        showStartScreen();
-      }
+        showModal(
+            'Sair da Rodada?',
+            'Seu progresso nesta rodada será perdido. Tem certeza que deseja sair?',
+            [
+                { text: 'Cancelar', class: 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600', action: hideModal },
+                { text: 'Sair', class: 'bg-red-600 text-white', action: () => { hideModal(); showStartScreen(); } }
+            ]
+        );
     }
 
     /***********************************************
@@ -602,7 +612,7 @@
         progressBar.style.width = '0%';
         return;
       }
-      const pct = Math.round((currentIndex / currentQuestions.length) * 100);
+      const pct = Math.round(((currentIndex + 1) / currentQuestions.length) * 100);
       progressBar.style.width = `${pct}%`;
     }
 
@@ -623,7 +633,6 @@
     }
 
     function triggerFailure() {
-      // small shake + icon
       const main = document.querySelector('main');
       main.classList.add('shake');
       setTimeout(()=> main.classList.remove('shake'), 500);
@@ -656,73 +665,106 @@
         return;
       }
       filtered.forEach(entry => {
-        const info = classMap[entry.level] || { name: entry.level, color: 'text-slate-700' };
+        const info = classMap[entry.level] || { name: entry.level };
         const el = document.createElement('div');
         el.className = 'flex justify-between items-center text-sm p-3 bg-white dark:bg-slate-800/50 rounded-md shadow-sm mb-2';
         el.innerHTML = `<div><strong class="mr-2">${info.name}</strong><span class="text-slate-600 dark:text-slate-200">${entry.score} / ${entry.total}</span></div><div class="text-xs text-slate-400">${entry.date}</div>`;
         historyLogContainerEl.appendChild(el);
       });
     }
-
+    
     function clearHistory() {
-      if (!confirm('Tem certeza que deseja apagar todo o histórico?')) return;
-      localStorage.removeItem(HISTORY_KEY);
-      showHistoryTab('medium');
+        showModal(
+            'Limpar Histórico?',
+            'Esta ação é irreversível e apagará todos os seus resultados salvos. Deseja continuar?',
+            [
+                { text: 'Cancelar', class: 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600', action: hideModal },
+                { text: 'Sim, Limpar', class: 'bg-red-600 text-white', action: () => {
+                    localStorage.removeItem(HISTORY_KEY);
+                    showHistoryTab('medium');
+                    hideModal();
+                }}
+            ]
+        );
+    }
+
+    /***********************************************
+     * Modal System
+     ***********************************************/
+    function showModal(title, body, actions = []) {
+        modalTitleEl.textContent = title;
+        modalBodyEl.innerHTML = body;
+        modalActionsEl.innerHTML = '';
+        
+        actions.forEach(action => {
+            const btn = document.createElement('button');
+            btn.textContent = action.text;
+            btn.className = `modal-button rounded-lg px-4 py-2 font-semibold ${action.class}`;
+            btn.onclick = action.action;
+            modalActionsEl.appendChild(btn);
+        });
+
+        modalEl.classList.add('visible');
+    }
+
+    function hideModal() {
+        modalEl.classList.remove('visible');
+    }
+
+    function showAbout() {
+        showModal(
+            'Sobre o Quiz',
+            '<p>Quiz de Computação em Nuvem II desenvolvido por <strong>MG Produções</strong> para fins didáticos.</p><p class="mt-2 text-sm">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">1</kbd>-<kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">4</kbd> selecionar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">N</kbd> próxima · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Esc</kbd> sair.</p>',
+            [{ text: 'Fechar', class: 'bg-sky-600 text-white', action: hideModal }]
+        );
     }
 
     /***********************************************
      * Keyboard accessibility
      ***********************************************/
     window.addEventListener('keydown', (e) => {
-      // Start screen shortcuts
+      // Close modal with Escape key
+      if (e.key === 'Escape' && modalEl.classList.contains('visible')) {
+        hideModal();
+        return;
+      }
+      
       if (!gameScreen.classList.contains('hidden')) {
         // In-game shortcuts
-        if (/^[1-4]$/.test(e.key)) {
+        if (/^[1-4]$/.test(e.key) && !confirmButton.classList.contains('hidden')) {
+          e.preventDefault();
           const idx = parseInt(e.key,10) - 1;
           const btn = optionsAreaEl.children[idx];
           if (btn) { btn.click(); btn.focus(); }
-        }
-        if (e.key === 'Enter') {
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
           if (!confirmButton.disabled) confirmButton.click();
           else if (!nextButton.classList.contains('hidden')) nextButton.click();
-        }
-        if (e.key.toLowerCase() === 'n') {
+        } else if (e.key.toLowerCase() === 'n') {
           if (!nextButton.classList.contains('hidden')) nextButton.click();
-        }
-        if (e.key === 'Escape') {
+        } else if (e.key === 'Escape') {
           exitGame();
         }
         return;
       }
+      
       // If on start screen
-      if (startScreen.classList.contains('hidden')) return;
-      if (e.key === '1') startGame('medium');
-      if (e.key === '2') startGame('hard');
-      if (e.key === '3') startGame('university');
+      if (!startScreen.classList.contains('hidden')) {
+        if (e.key === '1') startGame('medium');
+        if (e.key === '2') startGame('hard');
+        if (e.key === '3') startGame('university');
+      }
     });
 
-    /***********************************************
-     * Small helpers & init
-     ***********************************************/
-    function savePartialUIState() {
-      // placeholder for potential autosave per question
-    }
-
-    // wire replay button (set when show end)
-    replayButton.addEventListener('click', ()=> startGame(currentDifficulty || 'medium'));
-
-    // set initial UI state
+    // Initial UI setup
     (function initUI(){
-      // set icons
       setSound(soundEnabled);
-      // initialize pools already called
       showStartScreen();
-      // add invisible counters for accessibility (if needed)
-      const sr = document.createElement('div'); sr.className = 'sr-only'; sr.id = 'current-question'; document.body.appendChild(sr);
-      // ensure tab medium active by default for history
+      modalEl.addEventListener('click', (e) => {
+          if (e.target === modalEl) hideModal();
+      });
       document.getElementById('tab-medium').classList.add('active');
     })();
-
   </script>
 </body>
 </html>
