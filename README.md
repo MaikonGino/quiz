@@ -4,9 +4,6 @@ Um quiz interativo e responsivo, projetado para testar e aprimorar os conhecimen
 
 **➡️ Acesse a versão ao vivo aqui: [https://maikongino.github.io/quiz/](https://maikongino.github.io/quiz/)**
 
-![Demonstração do Quiz](https://i.imgur.com/83907c1.gif)
-*(Sugestão: Grave um GIF como este e substitua o link acima pelo seu!)*
-
 ---
 
 ## ✨ Funcionalidades Principais
