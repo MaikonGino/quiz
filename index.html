@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz de Computação em Nuvem II</title>
+
+    <meta property="og:title" content="Quiz de Computação em Nuvem II">
+    <meta property="og:description" content="Teste seus conhecimentos sobre AWS, Kubernetes, Serverless e DevOps. Desafie-se em diferentes níveis de dificuldade!">
+    <meta property="og:url" content="https://maikongino.github.io/quiz/">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://maikongino.github.io/quiz/thumbnail.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Cloud Quiz">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Quiz de Computação em Nuvem II">
+    <meta name="twitter:description" content="Teste seus conhecimentos sobre AWS, Kubernetes, Serverless e DevOps.">
+    <meta name="twitter:image" content="https://maikongino.github.io/quiz/thumbnail.png">
+    <meta name="theme-color" content="#0ea5e9">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +26,6 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* overflow: hidden; foi removido para evitar problemas de rolagem em telas pequenas com conteúdo grande */
         }
         .quiz-option, .level-button, .history-button, .action-button, .tab-button {
             transition: all 0.2s ease-in-out;
@@ -21,7 +34,6 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        /* -- CORREÇÃO: Feedback tátil para mobile -- */
         .quiz-option:active, .level-button:active, .history-button:active, .action-button:active:not(:disabled), .tab-button:active {
             transform: translateY(0) scale(0.98);
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -47,14 +59,23 @@
             color: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        /* Animações */
+        .animated-gradient {
+            background-image: linear-gradient(90deg, #38bdf8, #818cf8, #f472b6, #38bdf8);
+            background-size: 200% auto;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-animation 4s linear infinite;
+        }
+        @keyframes gradient-animation {
+            to { background-position: 200% center; }
+        }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
             20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
         .shake { animation: shake 0.5s ease-in-out; }
-
         @keyframes fall {
             0% { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
             100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
@@ -67,68 +88,82 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col min-h-screen">
 
     <div id="animation-overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none z-50"></div>
 
-    <div id="quiz-container" class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 relative z-10">
-        
-        <div id="start-screen" class="text-center">
-             <h1 class="text-3xl md:text-4xl font-bold text-sky-600 dark:text-sky-400 mb-4">Computação em Nuvem II ☁️</h1>
-            <p class="text-slate-600 dark:text-slate-400 mb-8 text-lg">Selecione o nível de dificuldade para começar ou veja seu histórico.</p>
-            <div class="grid grid-cols-1 gap-4 mb-6">
-                <button onclick="startGame('medium')" class="level-button w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 dark:focus-visible:ring-offset-slate-900">Nível Médio</button>
-                <button onclick="startGame('hard')" class="level-button w-full bg-amber-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-600 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 dark:focus-visible:ring-offset-slate-900">Nível Difícil</button>
-                <button onclick="startGame('university')" class="level-button w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 dark:focus-visible:ring-offset-slate-900">Hard (Universitário)</button>
-            </div>
-            <button onclick="showHistoryScreen()" class="history-button w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-900">Ver Histórico de Estudos</button>
-        </div>
-
-        <div id="game-screen" class="hidden">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-4 mb-6">
-                <div>
-                    <h2 id="quiz-title" class="text-xl font-bold"></h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Selecione a resposta correta.</p>
+    <main class="w-full flex-grow flex items-center justify-center p-4">
+        <div id="quiz-container" class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 relative z-10">
+            <div id="start-screen" class="text-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-sky-600 dark:text-sky-400 mb-4">Computação em Nuvem II ☁️</h1>
+                <p class="text-slate-600 dark:text-slate-400 mb-8 text-lg">Selecione o nível de dificuldade para começar ou veja seu histórico.</p>
+                <div class="grid grid-cols-1 gap-4 mb-6">
+                    <button onclick="startGame('medium')" class="level-button w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 dark:focus-visible:ring-offset-slate-900">Nível Médio</button>
+                    <button onclick="startGame('hard')" class="level-button w-full bg-amber-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-600 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 dark:focus-visible:ring-offset-slate-900">Nível Difícil</button>
+                    <button onclick="startGame('university')" class="level-button w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 dark:focus-visible:ring-offset-slate-900">Hard (Universitário)</button>
                 </div>
-                <div class="text-right">
-                    <p class="text-sm font-medium">Questão</p>
-                    <p class="text-lg font-bold"><span id="current-question"></span> / <span id="total-questions"></span></p>
+                <button onclick="showHistoryScreen()" class="history-button w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-900">Ver Histórico de Estudos</button>
+            </div>
+
+            <div id="game-screen" class="hidden">
+                <div class="flex justify-between items-start border-b border-slate-200 dark:border-slate-700 pb-4 mb-6">
+                    <div>
+                        <h2 id="quiz-title" class="text-xl font-bold"></h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Selecione a resposta correta.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <p class="text-sm font-medium">Questão</p>
+                            <p class="text-lg font-bold"><span id="current-question"></span> / <span id="total-questions"></span></p>
+                        </div>
+                        <button onclick="exitGame()" class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" title="Voltar ao Início">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="question-area" class="mb-6"><p id="question-text" class="text-lg md:text-xl font-semibold leading-relaxed"></p></div>
+                <div id="options-area" class="grid grid-cols-1 gap-4"></div>
+                <div id="action-area" class="mt-6 text-center h-14 flex items-center justify-center">
+                    <button id="confirm-button" onclick="confirmAnswer()" class="action-button w-1/2 bg-sky-600 text-white font-bold py-3 px-6 rounded-lg shadow-md disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" disabled>Confirmar</button>
+                    <button id="next-button" onclick="nextQuestion()" class="action-button w-1/2 bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500 dark:focus-visible:ring-offset-slate-800">Próxima</button>
                 </div>
             </div>
-            <div id="question-area" class="mb-6"><p id="question-text" class="text-lg md:text-xl font-semibold leading-relaxed"></p></div>
-            <div id="options-area" class="grid grid-cols-1 gap-4"></div>
-            <div id="action-area" class="mt-6 text-center h-14 flex items-center justify-center">
-                <button id="confirm-button" onclick="confirmAnswer()" class="action-button w-1/2 bg-sky-600 text-white font-bold py-3 px-6 rounded-lg shadow-md disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" disabled>Confirmar</button>
-                <button id="next-button" onclick="nextQuestion()" class="action-button w-1/2 bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500 dark:focus-visible:ring-offset-slate-800">Próxima</button>
+            
+            <div id="end-screen" class="hidden text-center">
+                 <h2 class="text-3xl font-bold mb-4">Fim da Rodada!</h2>
+                 <p class="text-slate-600 dark:text-slate-400 text-xl mb-2">Sua pontuação foi:</p>
+                 <p id="final-score" class="text-6xl font-extrabold text-sky-600 dark:text-sky-400 mb-8"></p>
+                 <button onclick="showStartScreen()" class="w-full bg-sky-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800">Jogar Novamente</button>
             </div>
-        </div>
-        
-        <div id="end-screen" class="hidden text-center">
-             <h2 class="text-3xl font-bold mb-4">Fim da Rodada!</h2>
-             <p class="text-slate-600 dark:text-slate-400 text-xl mb-2">Sua pontuação foi:</p>
-             <p id="final-score" class="text-6xl font-extrabold text-sky-600 dark:text-sky-400 mb-8"></p>
-             <button onclick="showStartScreen()" class="w-full bg-sky-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800">Jogar Novamente</button>
-        </div>
 
-        <div id="history-screen" class="hidden">
-             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-300">Histórico de Estudos</h2>
-                <button onclick="showStartScreen()" class="text-sm font-bold bg-slate-200 dark:bg-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-800">Voltar</button>
+            <div id="history-screen" class="hidden">
+                 <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-300">Histórico de Estudos</h2>
+                    <button onclick="showStartScreen()" class="text-sm font-bold bg-slate-200 dark:bg-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-800">Voltar</button>
+                </div>
+                <div class="border-b border-slate-200 dark:border-slate-700 mb-4">
+                    <nav class="flex space-x-2" aria-label="Tabs">
+                        <button onclick="showHistoryTab('medium')" id="tab-medium" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Médio</button>
+                        <button onclick="showHistoryTab('hard')" id="tab-hard" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Difícil</button>
+                        <button onclick="showHistoryTab('university')" id="tab-university" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Hard (Univ.)</button>
+                    </nav>
+                </div>
+                <div id="history-log-container" class="max-h-80 overflow-y-auto bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg space-y-2"></div>
+                <button onclick="clearHistory()" class="mt-6 w-full text-sm text-center text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded">Limpar todo o histórico</button>
             </div>
-            <div class="border-b border-slate-200 dark:border-slate-700 mb-4">
-                <nav class="flex space-x-2" aria-label="Tabs">
-                    <button onclick="showHistoryTab('medium')" id="tab-medium" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Médio</button>
-                    <button onclick="showHistoryTab('hard')" id="tab-hard" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Difícil</button>
-                    <button onclick="showHistoryTab('university')" id="tab-university" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Hard (Univ.)</button>
-                </nav>
-            </div>
-            <div id="history-log-container" class="max-h-80 overflow-y-auto bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg space-y-2"></div>
-            <button onclick="clearHistory()" class="mt-6 w-full text-sm text-center text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded">Limpar todo o histórico</button>
         </div>
-    </div>
+    </main>
 
+    <footer class="text-center p-4 text-slate-500 dark:text-slate-400 text-sm">
+        Desenvolvido por
+        <a href="https://portfoliomaikongino.web.app/" target="_blank" rel="noopener noreferrer" class="font-bold animated-gradient hover:opacity-80 transition-opacity">
+            MG Produções
+        </a>
+        - 2025
+    </footer>
+    
     <script>
-        // --- BANCO DE QUESTÕES EXPANDIDO DE COMPUTAÇÃO EM NUVEM ---
+        // --- BANCO DE QUESTÕES COMPLETO DE COMPUTAÇÃO EM NUVEM ---
         const questions = {
             medium: [
                 { question: "Qual é a abstração fundamental do Amazon EC2?", options: ["Um contêiner leve e portátil.", "Uma Máquina Virtual (VM) na infraestrutura da AWS.", "Uma função serverless que executa código sob demanda.", "Um banco de dados relacional totalmente gerenciado."], answer: "Uma Máquina Virtual (VM) na infraestrutura da AWS." },
@@ -139,7 +174,7 @@
                 { question: "O que é 'Infraestrutura como Código' (IaC)?", options: ["A prática de escrever o código da aplicação em uma linguagem de baixo nível.", "O gerenciamento de infraestrutura através de código e arquivos de configuração.", "A configuração manual de servidores usando uma interface gráfica web.", "O monitoramento do desempenho da aplicação por meio de logs e métricas."], answer: "O gerenciamento de infraestrutura através de código e arquivos de configuração." },
                 { question: "Qual a função de um 'Security Group' no contexto do Amazon EC2?", options: ["Balancear a carga de tráfego entre múltiplas instâncias para alta disponibilidade.", "Fornecer armazenamento persistente de dados para as instâncias, como um disco rígido.", "Atuar como um firewall virtual, controlando o tráfego de entrada e saída.", "Armazenar imagens de contêiner para serem usadas pelo Amazon ECS."], answer: "Atuar como um firewall virtual, controlando o tráfego de entrada e saída." },
                 { question: "No Kubernetes, qual é a menor unidade de implantação?", options: ["Nó (Node)", "Serviço (Service)", "Pod", "Cluster"], answer: "Pod" },
-                { question: "O que significa dizer que uma arquitetura é 'Event-Driven' (Orientada a Eventos)?", options: ["Que o código é executado em intervalos de tempo fixos, definidos pelo desenvolvedor.", "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo.", "Que a aplicação só pode ser acessada através de uma API RESTful.", "Que a infraestrutura é provisionada manually antes da execução do código."], answer: "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo." },
+                { question: "O que significa dizer que uma arquitetura é 'Event-Driven' (Orientada a Eventos)?", options: ["Que o código é executado em intervalos de tempo fixos, definidos pelo desenvolvedor.", "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo.", "Que a aplicação só pode ser acessada através de uma API RESTful.", "Que a infraestrutura é provisionada manualmente antes da execução do código."], answer: "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo." },
                 { question: "Qual o objetivo principal do AWS IAM (Identity and Access Management)?", options: ["Monitorar as métricas de desempenho dos recursos da AWS, como CPU e memória.", "Controlar o acesso aos recursos da AWS, definindo permissões para usuários e serviços.", "Orquestrar a implantação de contêineres em um cluster de instâncias EC2.", "Fornecer uma rede virtual isolada para lançar recursos da AWS com segurança."], answer: "Controlar o acesso aos recursos da AWS, definindo permissões para usuários e serviços." },
                 { question: "O que é uma AMI (Amazon Machine Image)?", options: ["Um serviço de banco de dados NoSQL totalmente gerenciado pela AWS.", "Um modelo pré-configurado para instâncias EC2, contendo SO e software.", "Uma interface de linha de comando para interagir com os serviços da AWS.", "Um contêiner Docker otimizado para rodar em ambientes da Amazon."], answer: "Um modelo pré-configurado para instâncias EC2, contendo SO e software." },
                 { question: "Qual é o principal propósito do Amazon S3 (Simple Storage Service)?", options: ["Executar código de aplicação em resposta a eventos de forma serverless.", "Fornecer poder computacional escalável na forma de máquinas virtuais.", "Armazenar e recuperar qualquer quantidade de dados, a qualquer momento, de qualquer lugar.", "Oferecer um serviço de banco de dados relacional gerenciado com alta disponibilidade."], answer: "Armazenar e recuperar qualquer quantidade de dados, a qualquer momento, de qualquer lugar." },
@@ -284,7 +319,7 @@
             ]
         };
 
-        // --- LÓGICA DO JOGO ---
+        // --- LÓGICA COMPLETA DO JOGO ---
         let questionPools = {};
         let currentDifficulty = '';
         let currentQuestions = [];
@@ -292,7 +327,6 @@
         let questionIndex = 0;
         let selectedOption = null;
         const totalGameQuestions = 15;
-
         const allScreens = ['start-screen', 'game-screen', 'end-screen', 'history-screen'];
         const quizContainer = document.getElementById('quiz-container');
         const animationOverlay = document.getElementById('animation-overlay');
@@ -305,13 +339,11 @@
         const nextButton = document.getElementById('next-button');
         const finalScoreEl = document.getElementById('final-score');
         const historyLogContainerEl = document.getElementById('history-log-container');
-        
         const difficultyMap = {
             medium: { name: 'Nível Médio', color: 'text-blue-500', titleClass: 'text-blue-600 dark:text-blue-400' },
             hard: { name: 'Nível Difícil', color: 'text-amber-500', titleClass: 'text-amber-500 dark:text-amber-400' },
             university: { name: 'Hard (Univ.)', color: 'text-red-500', titleClass: 'text-red-600 dark:text-red-400' }
         };
-
         let correctSynth, incorrectSynth;
 
         function setupAudio() {
@@ -352,6 +384,12 @@
             showHistoryTab('medium');
         }
 
+        function exitGame() {
+            if (confirm('Tem certeza que deseja sair? Seu progresso na rodada atual será perdido.')) {
+                showStartScreen();
+            }
+        }
+
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -371,15 +409,12 @@
                 Tone.start().then(setupAudio);
             }
             currentDifficulty = difficulty;
-            
             if (!questionPools[difficulty] || questionPools[difficulty].length < totalGameQuestions) {
                 initializePools();
             }
-            
             score = 0;
             questionIndex = 0;
             currentQuestions = questionPools[difficulty].splice(0, totalGameQuestions);
-            
             showScreen('game-screen');
             const levelInfo = difficultyMap[difficulty];
             quizTitleEl.textContent = levelInfo.name;
@@ -397,19 +432,17 @@
             currentQuestionEl.textContent = questionIndex + 1;
             questionTextEl.textContent = current.question;
             optionsAreaEl.innerHTML = '';
-            
             const shuffledOptions = [...current.options];
             shuffleArray(shuffledOptions);
-
             shuffledOptions.forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
-                // CORREÇÃO: Adicionado foco visível para acessibilidade
                 button.className = 'quiz-option w-full p-4 border-2 border-slate-300 dark:border-slate-600 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800';
                 button.onclick = () => selectOption(button, option);
                 optionsAreaEl.appendChild(button);
             });
         }
+
 
         function selectOption(button, option) {
             optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => btn.classList.remove('selected'));
