@@ -1,194 +1,179 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class=""> <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz de Computação em Nuvem II</title>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz de Computação em Nuvem II — MG Produções</title>
+  <meta name="description" content="Desafie seus conhecimentos em Computação em Nuvem com este quiz interativo! Níveis médio, difícil e universitário." />
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
 
-    <meta name="description" content="Desafie seus conhecimentos em Computação em Nuvem com este quiz interativo! Níveis médio, difícil e universitário.">
-    <meta name="theme-color" content="#0ea5e9"> <meta property="og:title" content="Quiz de Computação em Nuvem | Teste seus conhecimentos!">
-    <meta property="og:description" content="Desafie-se com perguntas sobre AWS, Kubernetes, Serverless e mais. Você está pronto?">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1618335829737-2228915674e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80">
-    <meta property="og:url" content="https://maikongino.github.io/quiz/">
-    <meta property="og:type" content="website">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Quiz de Computação em Nuvem | Teste seus conhecimentos!">
-    <meta name="twitter:description" content="Desafie-se com perguntas sobre AWS, Kubernetes, Serverless e mais. Você está pronto?">
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1618335829737-2228915674e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-        .quiz-option, .level-button, .history-button, .action-button, .tab-button {
-            transition: all 0.2s ease-in-out;
-        }
-        .quiz-option:hover:not(:disabled), .level-button:hover, .history-button:hover, .action-button:hover:not(:disabled), .tab-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .quiz-option:active, .level-button:active, .history-button:active, .action-button:active:not(:disabled), .tab-button:active {
-            transform: translateY(0) scale(0.98);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        .quiz-option.selected {
-            border-color: #38bdf8; /* sky-400 */
-            background-color: #e0f2fe; /* sky-100 */
-            color: #0369a1; /* sky-700 */
-        }
-        .dark .quiz-option.selected {
-            background-color: #0c4a6e; /* sky-900 */
-            color: #e0f2fe; /* sky-100 */
-        }
-        .correct {
-            background-color: #22c55e !important; color: white !important; border-color: #16a34a !important;
-        }
-        .incorrect {
-            background-color: #ef4444 !important; color: white !important; border-color: #dc2626 !important;
-        }
-        .tab-button.active {
-            border-color: #0ea5e9; /* sky-500 */
-            background-color: #0ea5e9;
-            color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .animated-gradient {
-            background-image: linear-gradient(90deg, #38bdf8, #818cf8, #f472b6, #38bdf8);
-            background-size: 200% auto;
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradient-animation 4s linear infinite;
-        }
-        @keyframes gradient-animation {
-            to { background-position: 200% center; }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        .shake { animation: shake 0.5s ease-in-out; }
-        @keyframes fall {
-            0% { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
-        }
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            animation: fall 3s linear forwards;
-        }
-    </style>
+  <style>
+    :root { --accent: #0ea5e9; --bg: #f1f5f9; --card: #ffffff; --text-dark: #0f1724; }
+    .dark { --bg: #0b1220; --card: #0f1724; --text-dark: #e6eef8; }
+    html,body { height: 100%; }
+    body { font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: var(--bg); color: var(--text-dark); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    .card { background: var(--card); border-radius: 16px; }
+    .focus-ring:focus { box-shadow: 0 6px 18px rgba(14,165,233,.12); outline: none; border-radius: 10px; }
+    .quiz-option, .level-button, .action-button, .tab-button { transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, background-color .15s; }
+    .quiz-option { background: #fff; border: 1px solid rgba(15,23,42,0.06); border-radius: 12px; padding: 16px; text-align:left; }
+    .quiz-option.selected { transform: translateY(-3px); border-width: 2px; box-shadow: 0 8px 20px rgba(2,6,23,0.06); }
+    .correct { background-color: #16a34a !important; color: white !important; border-color: #15803d !important; }
+    .incorrect { background-color: #dc2626 !important; color: white !important; border-color: #b91c1c !important; }
+    .confetti { position: absolute; width: 8px; height: 12px; opacity: 0.95; border-radius: 2px; will-change: transform, opacity; }
+    @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); } 100% { transform: translateY(120vh) rotate(720deg); opacity: 0; } }
+    .animated-gradient { background-image: linear-gradient(90deg,#38bdf8,#818cf8,#f472b6,#38bdf8); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation: gradient-animation 4s linear infinite; }
+    @keyframes gradient-animation { to { background-position:200% center; } }
+    .sr-only { position: absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    .shake { animation: shake 0.6s ease-in-out; }
+    @keyframes shake {
+      0%,100%{ transform: translateX(0); } 10%,30%,50%,70%{ transform: translateX(-6px);} 20%,40%,60%,80%{ transform: translateX(6px);}
+    }
+    .progress { height: 8px; background: rgba(0,0,0,0.06); border-radius: 999px; overflow: hidden; }
+    .progress > i { display:block; height:100%; background: linear-gradient(90deg,var(--accent),#7c3aed); width:0%; transition: width .45s ease; }
+    /* responsive */
+    @media (max-width:640px){
+      .quiz-option { padding: 12px; font-size: 14px; }
+    }
+  </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 grid grid-rows-[1fr_auto] min-h-screen">
+<body class="min-h-screen grid place-items-center p-6">
 
-    <main class="w-full flex items-center justify-center p-4">
-        <div id="quiz-container" class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 relative z-10">
-            
-            <div id="animation-overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none z-50 rounded-2xl overflow-hidden"></div>
-            
-            <button id="theme-toggle" class="absolute top-4 right-4 p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" title="Alterar tema">
-                <svg id="theme-toggle-dark-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                <svg id="theme-toggle-light-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-            </button>
+  <main class="w-full max-w-3xl card shadow-xl p-6 md:p-10 relative z-10">
+    <!-- Overlay for confetti -->
+    <div id="animation-overlay" class="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl"></div>
 
-            <div id="start-screen" class="text-center">
-                <h1 class="text-3xl md:text-4xl font-bold text-sky-600 dark:text-sky-400 mb-4">Computação em Nuvem II ☁️</h1>
-                <p class="text-slate-600 dark:text-slate-400 mb-8 text-lg">Selecione o nível de dificuldade para começar ou veja seu histórico.</p>
-                <div class="grid grid-cols-1 gap-4 mb-6">
-                    <button onclick="startGame('medium')" class="level-button w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 dark:focus-visible:ring-offset-slate-900">Nível Médio</button>
-                    <button onclick="startGame('hard')" class="level-button w-full bg-amber-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-600 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 dark:focus-visible:ring-offset-slate-900">Nível Difícil</button>
-                    <button onclick="startGame('university')" class="level-button w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 dark:focus-visible:ring-offset-slate-900">Hard (Universitário)</button>
-                </div>
-                <button onclick="showHistoryScreen()" class="history-button w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-900">Ver Histórico de Estudos</button>
-            </div>
-            <div id="game-screen" class="hidden">
-                <div class="flex justify-between items-start border-b border-slate-200 dark:border-slate-700 pb-4 mb-6">
-                    <div>
-                        <h2 id="quiz-title" class="text-xl font-bold"></h2>
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Selecione a resposta correta.</p>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="text-right">
-                            <p class="text-sm font-medium">Questão</p>
-                            <p class="text-lg font-bold"><span id="current-question"></span> / <span id="total-questions"></span></p>
-                        </div>
-                        <button onclick="exitGame()" class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" title="Voltar ao Início">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                        </button>
-                    </div>
-                </div>
-                <div id="question-area" class="mb-6"><p id="question-text" class="text-lg md:text-xl font-semibold leading-relaxed"></p></div>
-                <div id="options-area" class="grid grid-cols-1 gap-4"></div>
-                <div id="action-area" class="mt-6 text-center h-14 flex items-center justify-center">
-                    <button id="confirm-button" onclick="confirmAnswer()" class="action-button w-1/2 bg-sky-600 text-white font-bold py-3 px-6 rounded-lg shadow-md disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" disabled>Confirmar</button>
-                    <button id="next-button" onclick="nextQuestion()" class="action-button w-1/2 bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500 dark:focus-visible:ring-offset-slate-800">Próxima</button>
-                </div>
-            </div>
-            <div id="end-screen" class="hidden text-center">
-                 <h2 class="text-3xl font-bold mb-4">Fim da Rodada!</h2>
-                 <p class="text-slate-600 dark:text-slate-400 text-xl mb-2">Sua pontuação foi:</p>
-                 <p id="final-score" class="text-6xl font-extrabold text-sky-600 dark:text-sky-400 mb-8"></p>
-                 <button onclick="showStartScreen()" class="w-full bg-sky-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800">Jogar Novamente</button>
-            </div>
-
-            <div id="history-screen" class="hidden">
-                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-300">Histórico de Estudos</h2>
-                    <button onclick="showStartScreen()" class="text-sm font-bold bg-slate-200 dark:bg-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-800">Voltar</button>
-                </div>
-                <div class="border-b border-slate-200 dark:border-slate-700 mb-4">
-                    <nav class="flex space-x-2" aria-label="Tabs">
-                        <button onclick="showHistoryTab('medium')" id="tab-medium" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Médio</button>
-                        <button onclick="showHistoryTab('hard')" id="tab-hard" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Difícil</button>
-                        <button onclick="showHistoryTab('university')" id="tab-university" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Hard (Univ.)</button>
-                    </nav>
-                </div>
-                <div id="history-log-container" class="max-h-80 overflow-y-auto bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg space-y-2"></div>
-                <button onclick="clearHistory()" class="mt-6 w-full text-sm text-center text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded">Limpar todo o histórico</button>
-            </div>
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 grid place-items-center text-white font-extrabold text-xl">☁️</div>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-sky-600 dark:text-sky-400">Computação em Nuvem II</h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Teste seus conhecimentos — prático, rápido e didático.</p>
         </div>
-    </main>
-    <footer class="text-center p-4 text-slate-500 dark:text-slate-400 text-sm bg-slate-100 dark:bg-slate-900">
-        Desenvolvido por
-        <a href="https://portfoliomaikongino.web.app/" target="_blank" rel="noopener noreferrer" class="font-bold animated-gradient hover:opacity-80 transition-opacity">
-            MG Produções
-        </a>
-        - 2025
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="sound-toggle" class="focus-ring p-2 rounded-md" title="Ativar / Desativar som" aria-pressed="false">
+          <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M11 5L6 9H2v6h4l5 4V5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 9a4 4 0 010 6m2-10a8 8 0 010 14" /></svg>
+          <svg id="icon-sound-off" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 9l-6 6M6 9v6h4l5 4V5L10 9H6z"/></svg>
+        </button>
+
+        <button id="theme-toggle" class="focus-ring p-2 rounded-md" title="Alterar tema" aria-pressed="false">
+          <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6L19.8 4.2M12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Start screen -->
+    <section id="start-screen" class="space-y-5">
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Selecione o nível para começar. Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100">1</kbd> Médio · <kbd class="px-2 py-1 rounded bg-slate-100">2</kbd> Difícil · <kbd class="px-2 py-1 rounded bg-slate-100">3</kbd> Univ.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <button class="level-button focus-ring bg-white border border-slate-200 rounded-lg py-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('medium')" aria-label="Iniciar nível médio">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm text-slate-500">Nível</div>
+              <div class="text-lg font-bold">Médio</div>
+            </div>
+            <div class="text-sky-600 text-2xl">⚙️</div>
+          </div>
+        </button>
+
+        <button class="level-button focus-ring bg-white border border-slate-200 rounded-lg py-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('hard')" aria-label="Iniciar nível difícil">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm text-slate-500">Nível</div>
+              <div class="text-lg font-bold">Difícil</div>
+            </div>
+            <div class="text-amber-500 text-2xl">🔥</div>
+          </div>
+        </button>
+
+        <button class="level-button focus-ring bg-white border border-slate-200 rounded-lg py-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('university')" aria-label="Iniciar nível universitário">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm text-slate-500">Nível</div>
+              <div class="text-lg font-bold">Universitário</div>
+            </div>
+            <div class="text-red-600 text-2xl">🎓</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="showHistoryScreen()" class="history-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold hover:bg-sky-700">Ver Histórico</button>
+        <button onclick="showAbout()" class="focus-ring px-4 py-3 rounded-lg bg-white border border-slate-200">Sobre</button>
+      </div>
+    </section>
+
+    <!-- Game screen -->
+    <section id="game-screen" class="hidden space-y-4" aria-hidden="true">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 id="quiz-title" class="text-lg font-bold"></h2>
+          <p id="quiz-sub" class="text-sm text-slate-500 dark:text-slate-400">Selecione a resposta correta.</p>
+        </div>
+        <div class="w-48">
+          <div class="text-sm text-slate-500">Progresso</div>
+          <div class="progress mt-1" aria-hidden="true"><i id="progress-bar"></i></div>
+        </div>
+      </div>
+
+      <div id="question-area" class="p-4 rounded-lg border border-slate-100 dark:border-slate-700">
+        <p id="question-text" class="text-lg md:text-xl font-semibold leading-relaxed"></p>
+      </div>
+
+      <div id="options-area" class="grid gap-3"></div>
+
+      <div class="flex items-center gap-3 mt-2">
+        <button id="confirm-button" onclick="confirmAnswer()" class="action-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold disabled:opacity-50" disabled>Confirmar</button>
+        <button id="next-button" onclick="nextQuestion()" class="hidden action-button focus-ring flex-1 bg-emerald-600 text-white rounded-lg py-3 font-bold">Próxima</button>
+        <button onclick="exitGame()" class="p-3 rounded-lg border border-slate-200 hover:bg-slate-50">Sair</button>
+      </div>
+
+      <div class="text-sm text-slate-500 mt-1">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100">1</kbd>-<kbd class="px-2 py-1 rounded bg-slate-100">4</kbd> selecionar · <kbd class="px-2 py-1 rounded bg-slate-100">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100">N</kbd> próxima</div>
+    </section>
+
+    <!-- End screen -->
+    <section id="end-screen" class="hidden text-center space-y-4" aria-hidden="true">
+      <h2 class="text-3xl font-bold">Fim da Rodada 🎉</h2>
+      <p class="text-slate-600 dark:text-slate-400">Sua pontuação:</p>
+      <div id="final-score" class="text-5xl font-extrabold text-sky-600"></div>
+      <div class="flex gap-3">
+        <button onclick="showStartScreen()" class="flex-1 bg-white border border-slate-200 rounded-lg py-3">Voltar ao início</button>
+        <button id="replay-button" class="flex-1 bg-sky-600 text-white rounded-lg py-3">Jogar novamente</button>
+      </div>
+    </section>
+
+    <!-- History screen -->
+    <section id="history-screen" class="hidden" aria-hidden="true">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Histórico de Estudos</h2>
+        <div class="flex gap-2">
+          <button onclick="clearHistory()" class="text-sm text-red-500">Limpar tudo</button>
+          <button onclick="showStartScreen()" class="text-sm bg-white border border-slate-200 rounded-lg px-3 py-2">Voltar</button>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-3 mb-4">
+        <button id="tab-medium" class="tab-button focus-ring rounded-lg border border-slate-200 px-3 py-2" onclick="showHistoryTab('medium')">Médio</button>
+        <button id="tab-hard" class="tab-button focus-ring rounded-lg border border-slate-200 px-3 py-2" onclick="showHistoryTab('hard')">Difícil</button>
+        <button id="tab-university" class="tab-button focus-ring rounded-lg border border-slate-200 px-3 py-2" onclick="showHistoryTab('university')">Univ.</button>
+      </div>
+
+      <div id="history-log-container" class="bg-slate-50 dark:bg-slate-900/40 p-4 rounded-lg max-h-64 overflow-y-auto"></div>
+    </section>
+
+    <footer class="mt-6 text-sm text-slate-500 dark:text-slate-400 text-center">
+      Desenvolvido por <a href="https://portfoliomaikongino.web.app/" target="_blank" rel="noopener noreferrer" class="animated-gradient font-bold">MG Produções</a> — 2025
     </footer>
-    
-    <script>
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-
-        function applyTheme(isDark) {
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-                themeToggleLightIcon.classList.remove('hidden');
-                themeToggleDarkIcon.classList.add('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                themeToggleLightIcon.classList.add('hidden');
-                themeToggleDarkIcon.classList.remove('hidden');
-            }
-        }
-
-        const isDarkMode = localStorage.getItem('color-theme') === 'dark' || 
-                           (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        applyTheme(isDarkMode);
-
-        themeToggleBtn.addEventListener('click', () => {
-            const isCurrentlyDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('color-theme', isCurrentlyDark ? 'light' : 'dark');
-            applyTheme(!isCurrentlyDark);
-        });
+  </main>
+      <script>
         const questions = {
             medium: [
                 { question: "Qual é a abstração fundamental do Amazon EC2?", options: ["Um contêiner leve e portátil.", "Uma Máquina Virtual (VM) na infraestrutura da AWS.", "Uma função serverless que executa código sob demanda.", "Um banco de dados relacional totalmente gerenciado."], answer: "Uma Máquina Virtual (VM) na infraestrutura da AWS." },
@@ -343,227 +328,401 @@
                 { question: "O que é um 'release channel' no GKE?", options: ["Um canal de comunicação para suporte técnico com a equipe do Google.", "Uma funcionalidade que permite atualizações automáticas controladas do cluster.", "Um tipo de rede virtual para conectar clusters GKE em diferentes regiões.", "Uma política de segurança que restringe o acesso ao control plane do cluster."], answer: "Uma funcionalidade que permite atualizações automáticas controladas do cluster." }
             ]
         };
-        let questionPools = {};
-        let currentDifficulty = '';
-        let currentQuestions = [];
-        let score = 0;
-        let questionIndex = 0;
-        let selectedOption = null;
-        const totalGameQuestions = 15;
-        const allScreens = ['start-screen', 'game-screen', 'end-screen', 'history-screen'];
-        const quizContainer = document.getElementById('quiz-container');
-        const animationOverlay = document.getElementById('animation-overlay');
-        const quizTitleEl = document.getElementById('quiz-title');
-        const currentQuestionEl = document.getElementById('current-question');
-        const totalQuestionsEl = document.getElementById('total-questions');
-        const questionTextEl = document.getElementById('question-text');
-        const optionsAreaEl = document.getElementById('options-area');
-        const confirmButton = document.getElementById('confirm-button');
-        const nextButton = document.getElementById('next-button');
-        const finalScoreEl = document.getElementById('final-score');
-        const historyLogContainerEl = document.getElementById('history-log-container');
-        const difficultyMap = {
-            medium: { name: 'Nível Médio', color: 'text-blue-500', titleClass: 'text-blue-600 dark:text-blue-400' },
-            hard: { name: 'Nível Difícil', color: 'text-amber-500', titleClass: 'text-amber-500 dark:text-amber-400' },
-            university: { name: 'Hard (Univ.)', color: 'text-red-500', titleClass: 'text-red-600 dark:text-red-400' }
-        };
-        let correctSynth, incorrectSynth;
+       /***********************************************
+     * Estado & configurações
+     ***********************************************/
+    let pools = {};                 // shuffled pools per difficulty
+    let currentDifficulty = null;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let selectedOption = null;
+    let currentScore = 0;
+    const DEFAULT_TOTAL = 15;       // padrão por rodada (será adaptado se o pool for menor)
+    const classMap = {
+      medium: { name: 'Nível Médio', titleClass: 'text-blue-600 dark:text-blue-400' },
+      hard: { name: 'Nível Difícil', titleClass: 'text-amber-500 dark:text-amber-400' },
+      university: { name: 'Hard (Univ.)', titleClass: 'text-red-600 dark:text-red-400' }
+    };
 
-        function setupAudio() {
-            correctSynth = new Tone.PolySynth(Tone.Synth).toDestination();
-            incorrectSynth = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, release: 0.2 } }).toDestination();
-        }
-        function playCorrectSound() { if(correctSynth) correctSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n", Tone.now()); }
-        function playIncorrectSound() { if(incorrectSynth) incorrectSynth.triggerAttackRelease("C3", "8n", Tone.now()); }
+    /***********************************************
+     * DOM
+     ***********************************************/
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const endScreen = document.getElementById('end-screen');
+    const historyScreen = document.getElementById('history-screen');
 
-        function triggerSuccessAnimation() {
-            for (let i = 0; i < 50; i++) {
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti');
-                confetti.style.left = `${Math.random() * 100}vw`;
-                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                confetti.style.animationDuration = `${Math.random() * 2 + 3}s`;
-                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
-                animationOverlay.appendChild(confetti);
-            }
-            setTimeout(() => animationOverlay.innerHTML = '', 5000);
-        }
-        function triggerFailureAnimation() {
-            quizContainer.classList.add('shake');
-            animationOverlay.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-8xl opacity-50 animate-ping">😟</div>';
-            setTimeout(() => {
-                quizContainer.classList.remove('shake');
-                animationOverlay.innerHTML = '';
-            }, 600);
-        }
+    const quizTitleEl = document.getElementById('quiz-title');
+    const progressBar = document.getElementById('progress-bar');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsAreaEl = document.getElementById('options-area');
+    const confirmButton = document.getElementById('confirm-button');
+    const nextButton = document.getElementById('next-button');
+    const finalScoreEl = document.getElementById('final-score');
+    const historyLogContainerEl = document.getElementById('history-log-container');
+    const animationOverlay = document.getElementById('animation-overlay');
+    const replayButton = document.getElementById('replay-button');
 
-        function showScreen(screenId) {
-            allScreens.forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById(screenId).classList.remove('hidden');
-        }
-        function showStartScreen() { showScreen('start-screen'); }
-        function showHistoryScreen() { 
-            showScreen('history-screen');
-            showHistoryTab('medium');
-        }
+    // theme & sound elements
+    const themeToggle = document.getElementById('theme-toggle');
+    const iconMoon = document.getElementById('icon-moon');
+    const iconSun = document.getElementById('icon-sun');
+    const soundToggle = document.getElementById('sound-toggle');
+    const soundOnIcon = document.getElementById('icon-sound-on');
+    const soundOffIcon = document.getElementById('icon-sound-off');
 
-        function exitGame() {
-            if (confirm('Tem certeza que deseja sair? Seu progresso na rodada atual será perdido.')) {
-                showStartScreen();
-            }
-        }
+    /***********************************************
+     * Áudio (Tone.js)
+     ***********************************************/
+    let synthClick = null;
+    let synthCorrect = null;
+    let synthIncorrect = null;
+    let soundEnabled = localStorage.getItem('quiz-sound-enabled') !== 'false';
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-        
-        function initializePools() {
-            Object.keys(questions).forEach(level => {
-                questionPools[level] = [...questions[level]];
-                shuffleArray(questionPools[level]);
-            });
-        }
+    function setupAudio() {
+      if (synthClick) return;
+      synthClick = new Tone.Synth({ envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.1 } }).toDestination();
+      synthCorrect = new Tone.PolySynth(Tone.Synth).toDestination();
+      synthIncorrect = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, release: 0.2 } }).toDestination();
+    }
+    function setSound(on) {
+      soundEnabled = on;
+      soundOnIcon.classList.toggle('hidden', !on);
+      soundOffIcon.classList.toggle('hidden', on);
+      soundToggle.setAttribute('aria-pressed', String(on));
+      localStorage.setItem('quiz-sound-enabled', String(on));
+    }
+    setSound(soundEnabled);
 
-        function startGame(difficulty) {
-            if (Tone.context.state !== 'running') {
-                Tone.start().then(setupAudio);
-            }
-            currentDifficulty = difficulty;
-            
-            if (!questionPools[difficulty] || questionPools[difficulty].length < totalGameQuestions) {
-                initializePools();
-            }
-            
-            score = 0;
-            questionIndex = 0;
-            currentQuestions = questionPools[difficulty].splice(0, totalGameQuestions);
-            
-            showScreen('game-screen');
-            const levelInfo = difficultyMap[difficulty];
-            quizTitleEl.textContent = levelInfo.name;
-            quizTitleEl.className = `text-xl font-bold ${levelInfo.titleClass}`;
-            totalQuestionsEl.textContent = totalGameQuestions;
-            displayQuestion();
-        }
-        function displayQuestion() {
-            selectedOption = null;
-            confirmButton.disabled = true;
-            confirmButton.classList.remove('hidden');
-            nextButton.classList.add('hidden');
-            const current = currentQuestions[questionIndex];
-            currentQuestionEl.textContent = questionIndex + 1;
-            questionTextEl.textContent = current.question;
-            optionsAreaEl.innerHTML = '';
-            
-            const shuffledOptions = [...current.options];
-            shuffleArray(shuffledOptions);
+    function playClick() { if (!soundEnabled) return; try { synthClick.triggerAttackRelease('E4', '8n'); } catch(e){} }
+    function playCorrect() { if (!soundEnabled) return; try { synthCorrect.triggerAttackRelease(["C4","E4","G4"], "8n"); } catch(e){} }
+    function playWrong() { if (!soundEnabled) return; try { synthIncorrect.triggerAttackRelease("C3", "8n"); } catch(e){} }
 
-            shuffledOptions.forEach(option => {
-                const button = document.createElement('button');
-                button.textContent = option;
-                button.className = 'quiz-option w-full p-4 border-2 border-slate-300 dark:border-slate-600 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800';
-                button.onclick = () => selectOption(button, option);
-                optionsAreaEl.appendChild(button);
-            });
-        }
+    /***********************************************
+     * Theme
+     ***********************************************/
+    function applyTheme(isDark) {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        iconMoon.classList.remove('hidden');
+        iconSun.classList.add('hidden');
+        localStorage.setItem('color-theme','dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        iconMoon.classList.add('hidden');
+        iconSun.classList.remove('hidden');
+        localStorage.setItem('color-theme','light');
+      }
+    }
+    const preferDark = localStorage.getItem('color-theme') === 'dark' || (!localStorage.getItem('color-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    applyTheme(preferDark);
 
-        function selectOption(button, option) {
-            optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => btn.classList.remove('selected'));
-            button.classList.add('selected');
-            selectedOption = option;
-            confirmButton.disabled = false;
-        }
-        
-        function confirmAnswer() {
-            if (selectedOption === null) return;
-            const isCorrect = selectedOption === currentQuestions[questionIndex].answer;
-            optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => {
-                btn.disabled = true;
-                if (btn.textContent === currentQuestions[questionIndex].answer) btn.classList.add('correct');
-                if (btn.textContent === selectedOption && !isCorrect) btn.classList.add('incorrect');
-            });
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      applyTheme(!isDark);
+      themeToggle.setAttribute('aria-pressed', String(!isDark));
+    });
 
-            if (isCorrect) {
-                score++;
-                playCorrectSound();
-                triggerSuccessAnimation();
-            } else {
-                playIncorrectSound();
-                triggerFailureAnimation();
-            }
+    soundToggle.addEventListener('click', async () => {
+      // ensure audio context resumed by user gesture
+      if (Tone.context.state !== 'running') {
+        await Tone.start();
+        setupAudio();
+      }
+      setSound(!soundEnabled);
+    });
 
-            confirmButton.classList.add('hidden');
-            nextButton.textContent = (questionIndex < totalGameQuestions - 1) ? "Próxima Pergunta" : "Ver Pontuação";
-            nextButton.classList.remove('hidden');
-        }
-        
-        function nextQuestion() {
-            questionIndex++;
-            if(questionIndex < totalGameQuestions){
-                 displayQuestion();
-            } else {
-                 showEndScreen();
-            }
-        }
-        
-        function showEndScreen() {
-            saveScoreToHistory();
-            showScreen('end-screen');
-            finalScoreEl.textContent = `${score}/${totalGameQuestions}`;
-        }
-        
-        function saveScoreToHistory() {
-            const history = JSON.parse(localStorage.getItem('cloudQuizHistory_v2')) || [];
-            history.push({
-                level: currentDifficulty,
-                score: score,
-                total: totalGameQuestions,
-                date: new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
-            });
-            localStorage.setItem('cloudQuizHistory_v2', JSON.stringify(history));
-        }
+    /***********************************************
+     * Pools & inicialização
+     ***********************************************/
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
 
-        function showHistoryTab(level) {
-            ['medium', 'hard', 'university'].forEach(id => document.getElementById(`tab-${id}`).classList.remove('active'));
-            document.getElementById(`tab-${level}`).classList.add('active');
-            
-            const history = JSON.parse(localStorage.getItem('cloudQuizHistory_v2')) || [];
-            const filteredHistory = history.filter(entry => entry.level === level);
-            historyLogContainerEl.innerHTML = '';
+    function initPools() {
+      Object.keys(questions).forEach(level => {
+        pools[level] = [...questions[level]];
+        shuffle(pools[level]);
+      });
+    }
+    initPools();
 
-            if (filteredHistory.length === 0) {
-                historyLogContainerEl.innerHTML = `<p class="text-slate-500 dark:text-slate-400 text-center p-4">Nenhuma rodada jogada neste nível.</p>`;
-                return;
-            }
+    /***********************************************
+     * Fluxo do jogo
+     ***********************************************/
+    function showStartScreen() {
+      startScreen.classList.remove('hidden');
+      gameScreen.classList.add('hidden');
+      endScreen.classList.add('hidden');
+      historyScreen.classList.add('hidden');
+    }
+    function showHistoryScreen() {
+      startScreen.classList.add('hidden');
+      gameScreen.classList.add('hidden');
+      endScreen.classList.add('hidden');
+      historyScreen.classList.remove('hidden');
+      showHistoryTab('medium');
+    }
+    function showAbout() {
+      alert("Quiz de Computação em Nuvem II — desenvolvido por MG Produções.\nAtalhos: 1-4 selecionar · Enter confirmar · N próxima · Esc sair.");
+    }
 
-            filteredHistory.slice().reverse().forEach(entry => {
-                const levelInfo = difficultyMap[entry.level];
-                const entryDiv = document.createElement('div');
-                entryDiv.className = 'flex justify-between items-center text-sm p-3 bg-white dark:bg-slate-800/50 rounded-md shadow-sm';
-                entryDiv.innerHTML = `
-                        <div class="font-semibold">
-                            <span class="font-bold ${levelInfo.color}">${levelInfo.name}:</span>
-                            <span class="text-slate-800 dark:text-slate-200"> ${entry.score} de ${entry.total} pontos</span>
-                        </div>
-                        <span class="text-xs text-slate-400 dark:text-slate-500">${entry.date}</span>
-                `;
-                historyLogContainerEl.appendChild(entryDiv);
-            });
-        }
+    function startGame(level) {
+      // resume audio on first gesture
+      if (Tone.context.state !== 'running') {
+        Tone.start().then(setupAudio);
+      } else {
+        setupAudio();
+      }
 
-        function clearHistory() {
-            if (confirm('Tem certeza de que deseja apagar todo o seu histórico de estudos? Esta ação não pode ser desfeita.')) {
-                localStorage.removeItem('cloudQuizHistory_v2');
-                const currentTab = document.querySelector('.tab-button.active')?.id.replace('tab-', '') || 'medium';
-                showHistoryTab(currentTab);
-            }
-        }
-        
-        initializePools();
+      currentDifficulty = level;
+      // ensure pool has enough; re-init if necessary
+      if (!pools[level] || pools[level].length < 1) initPools();
+
+      currentScore = 0;
+      currentIndex = 0;
+
+      const poolLen = pools[level].length;
+      const total = Math.min(DEFAULT_TOTAL, poolLen);
+      // take first total questions (already shuffled)
+      currentQuestions = pools[level].slice(0, total);
+
+      // prepare UI
+      quizTitleEl.textContent = classMap[level].name;
+      quizTitleEl.className = `text-xl font-bold ${classMap[level].titleClass}`;
+      updateProgress();
+
+      startScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      endScreen.classList.add('hidden');
+      historyScreen.classList.add('hidden');
+
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      selectedOption = null;
+      confirmButton.disabled = true;
+      confirmButton.classList.remove('hidden');
+      nextButton.classList.add('hidden');
+
+      const q = currentQuestions[currentIndex];
+      questionTextEl.textContent = q.question;
+
+      // shuffle options for display
+      const opts = [...q.options];
+      shuffle(opts);
+
+      optionsAreaEl.innerHTML = '';
+      opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option focus-ring w-full';
+        btn.setAttribute('type','button');
+        btn.innerHTML = `<div class="flex justify-between items-center"><div><strong>${String.fromCharCode(65+idx)}.</strong> <span class="ml-2">${opt}</span></div><div class="text-xs text-slate-400">Pressione ${idx+1}</div></div>`;
+        btn.addEventListener('click', () => selectOption(btn, opt));
+        btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectOption(btn,opt); } });
+        optionsAreaEl.appendChild(btn);
+      });
+
+      // focus first option for accessibility
+      setTimeout(()=> { optionsAreaEl.querySelector('button')?.focus?.(); }, 120);
+      updateProgress();
+    }
+
+    function selectOption(button, option) {
+      optionsAreaEl.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+      button.classList.add('selected');
+      selectedOption = option;
+      confirmButton.disabled = false;
+      if (soundEnabled) playClick();
+    }
+
+    function confirmAnswer() {
+      if (selectedOption === null) return;
+      const q = currentQuestions[currentIndex];
+      const isCorrect = selectedOption === q.answer;
+      optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => {
+        const txt = btn.textContent.trim();
+        // compare by full option text - safer to check contains answer
+        if (txt.includes(q.answer)) btn.classList.add('correct');
+        if (txt.includes(selectedOption) && !isCorrect) { btn.classList.add('incorrect'); btn.classList.add('shake'); }
+        btn.disabled = true;
+      });
+
+      if (isCorrect) {
+        currentScore++;
+        playCorrect();
+        launchConfetti(20);
+      } else {
+        playWrong();
+        // subtle failure animation
+        triggerFailure();
+      }
+
+      confirmButton.classList.add('hidden');
+      nextButton.textContent = (currentIndex < currentQuestions.length - 1) ? "Próxima Pergunta" : "Ver Pontuação";
+      nextButton.classList.remove('hidden');
+      savePartialUIState(); // optional
+      updateProgress();
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= currentQuestions.length) {
+        endGame();
+        return;
+      }
+      renderQuestion();
+    }
+
+    function endGame() {
+      saveScoreToHistory(currentDifficulty, currentScore, currentQuestions.length);
+      finalScoreEl.textContent = `${currentScore} / ${currentQuestions.length}`;
+      replayButton.onclick = () => startGame(currentDifficulty);
+      gameScreen.classList.add('hidden');
+      endScreen.classList.remove('hidden');
+      // celebratory if >60%
+      if (currentScore / currentQuestions.length >= 0.6) launchConfetti(40);
+    }
+
+    function exitGame() {
+      if (confirm('Deseja realmente sair da rodada atual? Progresso será perdido.')) {
         showStartScreen();
-    </script>
+      }
+    }
+
+    /***********************************************
+     * Progress, confetti & small animations
+     ***********************************************/
+    function updateProgress() {
+      if (!currentQuestions || currentQuestions.length === 0) {
+        progressBar.style.width = '0%';
+        return;
+      }
+      const pct = Math.round((currentIndex / currentQuestions.length) * 100);
+      progressBar.style.width = `${pct}%`;
+    }
+
+    function launchConfetti(amount = 20) {
+      const colors = ['#ef4444','#f59e0b','#10b981','#60a5fa','#a78bfa','#f472b6'];
+      for (let i=0;i<amount;i++){
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.style.left = (Math.random()*100) + '%';
+        el.style.background = colors[Math.floor(Math.random()*colors.length)];
+        el.style.width = (6 + Math.random()*10) + 'px';
+        el.style.height = (8 + Math.random()*14) + 'px';
+        el.style.top = '-10vh';
+        el.style.animation = `confettiFall ${2 + Math.random()*2}s linear forwards`;
+        animationOverlay.appendChild(el);
+        setTimeout(()=> el.remove(), 5000);
+      }
+    }
+
+    function triggerFailure() {
+      // small shake + icon
+      const main = document.querySelector('main');
+      main.classList.add('shake');
+      setTimeout(()=> main.classList.remove('shake'), 500);
+    }
+
+    /***********************************************
+     * Histórico (localStorage)
+     ***********************************************/
+    const HISTORY_KEY = 'cloudQuizHistory_v2';
+    function saveScoreToHistory(level, score, total) {
+      const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      history.push({
+        level,
+        score,
+        total,
+        date: new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' })
+      });
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    }
+
+    function showHistoryTab(level) {
+      ['medium','hard','university'].forEach(id => document.getElementById(`tab-${id}`).classList.remove('active'));
+      document.getElementById(`tab-${level}`).classList.add('active');
+
+      const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      const filtered = history.filter(h => h.level === level).slice().reverse();
+      historyLogContainerEl.innerHTML = '';
+      if (filtered.length === 0) {
+        historyLogContainerEl.innerHTML = `<p class="text-slate-500 dark:text-slate-400 text-center p-4">Nenhuma rodada jogada neste nível.</p>`;
+        return;
+      }
+      filtered.forEach(entry => {
+        const info = classMap[entry.level] || { name: entry.level, color: 'text-slate-700' };
+        const el = document.createElement('div');
+        el.className = 'flex justify-between items-center text-sm p-3 bg-white dark:bg-slate-800/50 rounded-md shadow-sm mb-2';
+        el.innerHTML = `<div><strong class="mr-2">${info.name}</strong><span class="text-slate-600 dark:text-slate-200">${entry.score} / ${entry.total}</span></div><div class="text-xs text-slate-400">${entry.date}</div>`;
+        historyLogContainerEl.appendChild(el);
+      });
+    }
+
+    function clearHistory() {
+      if (!confirm('Tem certeza que deseja apagar todo o histórico?')) return;
+      localStorage.removeItem(HISTORY_KEY);
+      showHistoryTab('medium');
+    }
+
+    /***********************************************
+     * Keyboard accessibility
+     ***********************************************/
+    window.addEventListener('keydown', (e) => {
+      // Start screen shortcuts
+      if (!gameScreen.classList.contains('hidden')) {
+        // In-game shortcuts
+        if (/^[1-4]$/.test(e.key)) {
+          const idx = parseInt(e.key,10) - 1;
+          const btn = optionsAreaEl.children[idx];
+          if (btn) { btn.click(); btn.focus(); }
+        }
+        if (e.key === 'Enter') {
+          if (!confirmButton.disabled) confirmButton.click();
+          else if (!nextButton.classList.contains('hidden')) nextButton.click();
+        }
+        if (e.key.toLowerCase() === 'n') {
+          if (!nextButton.classList.contains('hidden')) nextButton.click();
+        }
+        if (e.key === 'Escape') {
+          exitGame();
+        }
+        return;
+      }
+      // If on start screen
+      if (startScreen.classList.contains('hidden')) return;
+      if (e.key === '1') startGame('medium');
+      if (e.key === '2') startGame('hard');
+      if (e.key === '3') startGame('university');
+    });
+
+    /***********************************************
+     * Small helpers & init
+     ***********************************************/
+    function savePartialUIState() {
+      // placeholder for potential autosave per question
+    }
+
+    // wire replay button (set when show end)
+    replayButton.addEventListener('click', ()=> startGame(currentDifficulty || 'medium'));
+
+    // set initial UI state
+    (function initUI(){
+      // set icons
+      setSound(soundEnabled);
+      // initialize pools already called
+      showStartScreen();
+      // add invisible counters for accessibility (if needed)
+      const sr = document.createElement('div'); sr.className = 'sr-only'; sr.id = 'current-question'; document.body.appendChild(sr);
+      // ensure tab medium active by default for history
+      document.getElementById('tab-medium').classList.add('active');
+    })();
+
+  </script>
 </body>
 </html>
