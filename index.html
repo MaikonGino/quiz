@@ -12,42 +12,16 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
 
- <style>
-    :root { 
-        --accent: #0ea5e9; 
-        --bg: #f1f5f9; 
-        --card: #ffffff; 
-        --text-primary: #1e293b;
-        --text-secondary: #64748b;
-        --border-color: #e2e8f0;
-    }
-    .dark { 
-        --bg: #0f172a; 
-        --card: #1e293b; 
-        --text-primary: #e2e8f0;
-        --text-secondary: #94a3b8;
-        --border-color: #334155;
-    }
+  <style>
+    :root { --accent: #0ea5e9; --bg: #f1f5f9; --card: #ffffff; --text-dark: #0f1724; }
+    .dark { --bg: #0b1220; --card: #0f1724; --text-dark: #e6eef8; }
     html,body { height: 100%; }
-    body { 
-        font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; 
-        background-color: var(--bg); 
-        color: var(--text-primary); 
-        -webkit-font-smoothing:antialiased; 
-        -moz-osx-font-smoothing:grayscale; 
-    }
-    .card { background-color: var(--card); border-radius: 16px; }
-    .focus-ring:focus-visible { box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.4); outline: none; border-radius: 10px; }
+    body { font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: var(--bg); color: var(--text-dark); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    .card { background: var(--card); border-radius: 16px; }
+    .focus-ring:focus-visible { box-shadow: 0 6px 18px rgba(14,165,233,.12); outline: none; border-radius: 10px; }
     .quiz-option, .level-button, .action-button, .tab-button, .modal-button { transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, background-color .15s, border-color .15s; cursor: pointer; }
-    .quiz-option { 
-        background-color: var(--card);
-        border: 1px solid var(--border-color); 
-        border-radius: 12px; 
-        padding: 16px; 
-        text-align:left; 
-    }
+    .quiz-option { background: #fff; border: 1px solid rgba(15,23,42,0.06); border-radius: 12px; padding: 16px; text-align:left; }
     .quiz-option.selected { transform: translateY(-3px); border-width: 2px; border-color: var(--accent); box-shadow: 0 8px 20px rgba(2,6,23,0.06); }
-    .dark .quiz-option.selected { box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
     .correct { background-color: #16a34a !important; color: white !important; border-color: #15803d !important; }
     .incorrect { background-color: #dc2626 !important; color: white !important; border-color: #b91c1c !important; }
     .confetti { position: absolute; width: 8px; height: 12px; opacity: 0.95; border-radius: 2px; will-change: transform, opacity; }
@@ -56,16 +30,71 @@
     @keyframes gradient-animation { to { background-position:200% center; } }
     .sr-only { position: absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     .shake { animation: shake 0.6s ease-in-out; }
-    @keyframes shake { 0%,100%{ transform: translateX(0); } 10%,30%,50%,70%{ transform: translateX(-6px);} 20%,40%,60%,80%{ transform: translateX(6px);} }
-    .progress { height: 8px; background-color: var(--border-color); border-radius: 999px; overflow: hidden; }
+    @keyframes shake {
+      0%,100%{ transform: translateX(0); } 10%,30%,50%,70%{ transform: translateX(-6px);} 20%,40%,60%,80%{ transform: translateX(6px);}
+    }
+    .progress { height: 8px; background: rgba(0,0,0,0.06); border-radius: 999px; overflow: hidden; }
     .progress > i { display:block; height:100%; background: linear-gradient(90deg,var(--accent),#7c3aed); width:0%; transition: width .45s ease; }
+    
+    /* Histórico */
     .tab-button.active { background-color: var(--accent); color: white; border-color: var(--accent); }
+    .dark .tab-button.active { background-color: var(--accent); border-color: var(--accent); }
+
+    /* Modal Styles */
     .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; }
     .modal-overlay.visible { opacity: 1; visibility: visible; }
-    .modal-content { background: var(--card); color: var(--text-primary); padding: 2rem; border-radius: 16px; width: 90%; max-width: 500px; transform: scale(0.95); transition: transform 0.3s ease; }
+    .modal-content { background: var(--card); color: var(--text-dark); padding: 2rem; border-radius: 16px; width: 90%; max-width: 500px; transform: scale(0.95); transition: transform 0.3s ease; }
     .modal-overlay.visible .modal-content { transform: scale(1); }
-    @media (max-width:640px){ .quiz-option { padding: 12px; font-size: 14px; } .modal-content { padding: 1.5rem; } }
-</style>
+
+    /* Melhorias adicionadas */
+    .option-indicator {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background-color: rgba(14, 165, 233, 0.1);
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    
+    .quiz-option.selected .option-indicator {
+      background-color: var(--accent);
+      color: white;
+    }
+    
+    .progress-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .progress-text {
+      font-size: 0.875rem;
+      color: #64748b;
+      min-width: 60px;
+    }
+    
+    .dark .progress-text {
+      color: #94a3b8;
+    }
+
+    @media (max-width:640px){
+      .quiz-option { padding: 12px; font-size: 14px; }
+      .modal-content { padding: 1.5rem; }
+      .progress-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .progress-text {
+        min-width: auto;
+      }
+    }
+  </style>
 </head>
 <body class="min-h-screen grid place-items-center p-6">
 
@@ -141,8 +170,10 @@
           <p id="quiz-sub" class="text-sm text-slate-500 dark:text-slate-400">Selecione a resposta correta.</p>
         </div>
         <div class="w-48">
-          <div class="text-sm text-slate-500">Progresso</div>
-          <div class="progress mt-1" aria-hidden="true"><i id="progress-bar"></i></div>
+          <div class="progress-container">
+            <span class="progress-text" id="progress-text">0/0</span>
+            <div class="progress flex-1 mt-1" aria-hidden="true"><i id="progress-bar"></i></div>
+          </div>
         </div>
       </div>
 
@@ -379,6 +410,7 @@
     const historyScreen = document.getElementById('history-screen');
     const quizTitleEl = document.getElementById('quiz-title');
     const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
     const questionTextEl = document.getElementById('question-text');
     const optionsAreaEl = document.getElementById('options-area');
     const confirmButton = document.getElementById('confirm-button');
@@ -517,7 +549,13 @@
         btn.className = 'quiz-option focus-ring w-full dark:bg-slate-800 dark:border-slate-700';
         btn.setAttribute('type','button');
         btn.dataset.option = opt;
-        btn.innerHTML = `<span class="font-bold w-6">${String.fromCharCode(65+idx)}.</span> <span class="ml-2">${opt}</span>`;
+        // CORREÇÃO: Indicador visual melhorado para as opções
+        btn.innerHTML = `
+          <div class="flex items-start">
+            <div class="option-indicator">${String.fromCharCode(65+idx)}</div>
+            <span>${opt}</span>
+          </div>
+        `;
         btn.addEventListener('click', () => selectOption(btn, opt));
         optionsAreaEl.appendChild(btn);
       });
@@ -593,10 +631,12 @@
     function updateProgress() {
       if (!currentQuestions || currentQuestions.length === 0) {
         progressBar.style.width = '0%';
+        progressText.textContent = '0/0';
         return;
       }
       const pct = Math.round((currentIndex / currentQuestions.length) * 100);
       progressBar.style.width = `${pct}%`;
+      progressText.textContent = `${currentIndex + 1}/${currentQuestions.length}`;
     }
 
     function launchConfetti(amount = 20) {
