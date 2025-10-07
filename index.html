@@ -18,7 +18,7 @@
     html,body { height: 100%; }
     body { font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: var(--bg); color: var(--text-dark); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     .card { background: var(--card); border-radius: 16px; }
-    .focus-ring:focus { box-shadow: 0 6px 18px rgba(14,165,233,.12); outline: none; border-radius: 10px; }
+    .focus-ring:focus-visible { box-shadow: 0 6px 18px rgba(14,165,233,.12); outline: none; border-radius: 10px; }
     .quiz-option, .level-button, .action-button, .tab-button, .modal-button { transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, background-color .15s, border-color .15s; cursor: pointer; }
     .quiz-option { background: #fff; border: 1px solid rgba(15,23,42,0.06); border-radius: 12px; padding: 16px; text-align:left; }
     .quiz-option.selected { transform: translateY(-3px); border-width: 2px; border-color: var(--accent); box-shadow: 0 8px 20px rgba(2,6,23,0.06); }
@@ -67,22 +67,22 @@
       </div>
       <div class="flex items-center gap-2">
         <button id="sound-toggle" class="focus-ring p-2 rounded-md" title="Ativar / Desativar som" aria-pressed="false">
-          <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M11 5L6 9H2v6h4l5 4V5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 9a4 4 0 010 6m2-10a8 8 0 010 14" /></svg>
-          <svg id="icon-sound-off" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 9l-6 6M6 9v6h4l5 4V5L10 9H6z"/></svg>
+          <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M11 5L6 9H2v6h4l5 4V5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 9a4 4 0 010 6m2-10a8 8 0 010 14" /></svg>
+          <svg id="icon-sound-off" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500 dark:text-slate-400 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 9l-6 6M6 9v6h4l5 4V5L10 9H6z"/></svg>
         </button>
 
         <button id="theme-toggle" class="focus-ring p-2 rounded-md" title="Alterar tema" aria-pressed="false">
-          <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-          <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6L19.8 4.2M12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
+          <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 dark:text-slate-300 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 dark:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6L19.8 4.2M12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
         </button>
       </div>
     </header>
 
     <section id="start-screen" class="space-y-5">
-      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Selecione o nível para começar. Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">1</kbd> Médio · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">2</kbd> Difícil · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">3</kbd> Univ.</p>
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Selecione o nível de dificuldade para iniciar o quiz.</p>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('medium')" aria-label="Iniciar nível médio">
+        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md hover:-translate-y-1" onclick="startGame('medium')" aria-label="Iniciar nível médio">
           <div class="flex items-center justify-between">
             <div class="text-left">
               <div class="text-sm text-slate-500">Nível</div>
@@ -92,7 +92,7 @@
           </div>
         </button>
 
-        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('hard')" aria-label="Iniciar nível difícil">
+        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md hover:-translate-y-1" onclick="startGame('hard')" aria-label="Iniciar nível difícil">
           <div class="flex items-center justify-between">
             <div class="text-left">
               <div class="text-sm text-slate-500">Nível</div>
@@ -102,7 +102,7 @@
           </div>
         </button>
 
-        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md" onclick="startGame('university')" aria-label="Iniciar nível universitário">
+        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md hover:-translate-y-1" onclick="startGame('university')" aria-label="Iniciar nível universitário">
           <div class="flex items-center justify-between">
             <div class="text-left">
               <div class="text-sm text-slate-500">Nível</div>
@@ -143,7 +143,7 @@
         <button onclick="exitGame()" class="action-button p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">Sair</button>
       </div>
 
-      <div class="text-sm text-slate-500 mt-1">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">1</kbd>-<kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">4</kbd> selecionar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">N</kbd> próxima</div>
+      <div class="text-sm text-slate-500 mt-1">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">N</kbd> próxima</div>
     </section>
 
     <section id="end-screen" class="hidden text-center space-y-4" aria-hidden="true">
@@ -341,27 +341,27 @@
                 { question: "O que é um 'release channel' no GKE?", options: ["Um canal de comunicação para suporte técnico com a equipe do Google.", "Uma funcionalidade que permite atualizações automáticas controladas do cluster.", "Um tipo de rede virtual para conectar clusters GKE em diferentes regiões.", "Uma política de segurança que restringe o acesso ao control plane do cluster."], answer: "Uma funcionalidade que permite atualizações automáticas controladas do cluster." }
             ]
         };
-      let pools = {};                  // shuffled pools per difficulty
+    
+    let pools = {};
     let currentDifficulty = null;
     let currentQuestions = [];
     let currentIndex = 0;
     let selectedOption = null;
     let currentScore = 0;
-    const DEFAULT_TOTAL = 15;        // padrão por rodada (será adaptado se o pool for menor)
+    const DEFAULT_TOTAL = 10;
     const classMap = {
-      medium: { name: 'Nível Médio', titleClass: 'text-blue-600 dark:text-blue-400' },
-      hard: { name: 'Nível Difícil', titleClass: 'text-amber-500 dark:text-amber-400' },
-      university: { name: 'Nível Universitário', titleClass: 'text-red-600 dark:text-red-400' }
+      medium: { name: 'Nível Médio 📚', titleClass: 'text-blue-600 dark:text-blue-400' },
+      hard: { name: 'Nível Difícil ✒️', titleClass: 'text-amber-500 dark:text-amber-400' },
+      university: { name: 'Nível Universitário 🎓', titleClass: 'text-red-600 dark:text-red-400' }
     };
 
     /***********************************************
-     * DOM
+     * DOM Elements
      ***********************************************/
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
     const endScreen = document.getElementById('end-screen');
     const historyScreen = document.getElementById('history-screen');
-
     const quizTitleEl = document.getElementById('quiz-title');
     const progressBar = document.getElementById('progress-bar');
     const questionTextEl = document.getElementById('question-text');
@@ -372,21 +372,16 @@
     const historyLogContainerEl = document.getElementById('history-log-container');
     const animationOverlay = document.getElementById('animation-overlay');
     const replayButton = document.getElementById('replay-button');
-
-    // theme & sound elements
     const themeToggle = document.getElementById('theme-toggle');
     const iconMoon = document.getElementById('icon-moon');
     const iconSun = document.getElementById('icon-sun');
     const soundToggle = document.getElementById('sound-toggle');
     const soundOnIcon = document.getElementById('icon-sound-on');
     const soundOffIcon = document.getElementById('icon-sound-off');
-    
-    // Modal elements
     const modalEl = document.getElementById('modal');
     const modalTitleEl = document.getElementById('modal-title');
     const modalBodyEl = document.getElementById('modal-body');
     const modalActionsEl = document.getElementById('modal-actions');
-
 
     /***********************************************
      * Áudio (Tone.js)
@@ -411,8 +406,6 @@
       soundToggle.setAttribute('aria-pressed', String(on));
       localStorage.setItem('quiz-sound-enabled', String(on));
     }
-    setSound(soundEnabled);
-
     function playClick() { if (!soundEnabled || !synthClick) return; try { synthClick.triggerAttackRelease('E4', '8n'); } catch(e){} }
     function playCorrect() { if (!soundEnabled || !synthCorrect) return; try { synthCorrect.triggerAttackRelease(["C4","E4","G4"], "8n"); } catch(e){} }
     function playWrong() { if (!soundEnabled || !synthIncorrect) return; try { synthIncorrect.triggerAttackRelease("C3", "8n"); } catch(e){} }
@@ -432,27 +425,11 @@
         iconSun.classList.remove('hidden');
         localStorage.setItem('color-theme','light');
       }
+      themeToggle.setAttribute('aria-pressed', String(isDark));
     }
-    const preferDark = localStorage.getItem('color-theme') === 'dark' || (!localStorage.getItem('color-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    applyTheme(preferDark);
-
-    themeToggle.addEventListener('click', () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      applyTheme(!isDark);
-      themeToggle.setAttribute('aria-pressed', String(!isDark));
-    });
-
-    soundToggle.addEventListener('click', async () => {
-      // ensure audio context resumed by user gesture
-      if (Tone.context.state !== 'running') {
-        await Tone.start();
-        setupAudio();
-      }
-      setSound(!soundEnabled);
-    });
 
     /***********************************************
-     * Pools & inicialização
+     * Game Flow & Logic
      ***********************************************/
     function shuffle(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
@@ -467,15 +444,11 @@
         shuffle(pools[level]);
       });
     }
-    initPools();
 
-    /***********************************************
-     * Fluxo do jogo
-     ***********************************************/
     function showScreen(screenToShow) {
         [startScreen, gameScreen, endScreen, historyScreen].forEach(screen => {
             screen.classList.toggle('hidden', screen !== screenToShow);
-            screen.setAttribute('aria-hidden', screen !== screenToShow);
+            screen.setAttribute('aria-hidden', String(screen !== screenToShow));
         });
     }
 
@@ -487,7 +460,6 @@
     }
 
     function startGame(level) {
-      // resume audio on first gesture
       if (Tone.context.state !== 'running') {
         Tone.start().then(setupAudio);
       } else {
@@ -506,13 +478,13 @@
 
       quizTitleEl.textContent = classMap[level].name;
       quizTitleEl.className = `text-xl font-bold ${classMap[level].titleClass}`;
-      updateProgress();
-
+      
       showScreen(gameScreen);
       renderQuestion();
     }
 
     function renderQuestion() {
+      updateProgress();
       selectedOption = null;
       confirmButton.disabled = true;
       confirmButton.classList.remove('hidden');
@@ -529,14 +501,14 @@
         const btn = document.createElement('button');
         btn.className = 'quiz-option focus-ring w-full dark:bg-slate-800 dark:border-slate-700';
         btn.setAttribute('type','button');
-        btn.dataset.option = opt; // Robust way to store option value
-        btn.innerHTML = `<div class="flex justify-between items-center"><div><strong>${String.fromCharCode(65+idx)}.</strong> <span class="ml-2">${opt}</span></div><div class="text-xs text-slate-400">Pressione ${idx+1}</div></div>`;
+        btn.dataset.option = opt;
+        // CORREÇÃO: Removido o texto de atalho numérico para uma UI mais limpa
+        btn.innerHTML = `<strong>${String.fromCharCode(65+idx)}.</strong> <span class="ml-2">${opt}</span>`;
         btn.addEventListener('click', () => selectOption(btn, opt));
         optionsAreaEl.appendChild(btn);
       });
 
-      setTimeout(()=> { optionsAreaEl.querySelector('button')?.focus?.(); }, 120);
-      updateProgress();
+      setTimeout(()=> { optionsAreaEl.querySelector('button')?.focus(); }, 120);
     }
 
     function selectOption(button, option) {
@@ -567,22 +539,21 @@
         launchConfetti(20);
       } else {
         playWrong();
-        triggerFailure();
       }
 
       confirmButton.classList.add('hidden');
       nextButton.textContent = (currentIndex < currentQuestions.length - 1) ? "Próxima Pergunta" : "Ver Pontuação";
       nextButton.classList.remove('hidden');
-      updateProgress();
+      nextButton.focus();
     }
 
     function nextQuestion() {
       currentIndex++;
       if (currentIndex >= currentQuestions.length) {
         endGame();
-        return;
+      } else {
+        renderQuestion();
       }
-      renderQuestion();
     }
 
     function endGame() {
@@ -594,48 +565,37 @@
     }
 
     function exitGame() {
-        showModal(
-            'Sair da Rodada?',
-            'Seu progresso nesta rodada será perdido. Tem certeza que deseja sair?',
+        showModal( 'Sair da Rodada?', 'Seu progresso será perdido. Tem certeza?',
             [
                 { text: 'Cancelar', class: 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600', action: hideModal },
                 { text: 'Sair', class: 'bg-red-600 text-white', action: () => { hideModal(); showStartScreen(); } }
             ]
         );
     }
-
+    
     /***********************************************
-     * Progress, confetti & small animations
+     * UI Helpers (Progress, Confetti, etc.)
      ***********************************************/
     function updateProgress() {
       if (!currentQuestions || currentQuestions.length === 0) {
         progressBar.style.width = '0%';
         return;
       }
-      const pct = Math.round(((currentIndex + 1) / currentQuestions.length) * 100);
+      const pct = Math.round((currentIndex / currentQuestions.length) * 100);
       progressBar.style.width = `${pct}%`;
     }
 
     function launchConfetti(amount = 20) {
       const colors = ['#ef4444','#f59e0b','#10b981','#60a5fa','#a78bfa','#f472b6'];
-      for (let i=0;i<amount;i++){
+      for (let i=0; i<amount; i++){
         const el = document.createElement('div');
         el.className = 'confetti';
         el.style.left = (Math.random()*100) + '%';
         el.style.background = colors[Math.floor(Math.random()*colors.length)];
-        el.style.width = (6 + Math.random()*10) + 'px';
-        el.style.height = (8 + Math.random()*14) + 'px';
-        el.style.top = '-10vh';
         el.style.animation = `confettiFall ${2 + Math.random()*2}s linear forwards`;
         animationOverlay.appendChild(el);
         setTimeout(()=> el.remove(), 5000);
       }
-    }
-
-    function triggerFailure() {
-      const main = document.querySelector('main');
-      main.classList.add('shake');
-      setTimeout(()=> main.classList.remove('shake'), 500);
     }
 
     /***********************************************
@@ -644,13 +604,8 @@
     const HISTORY_KEY = 'cloudQuizHistory_v2';
     function saveScoreToHistory(level, score, total) {
       const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-      history.push({
-        level,
-        score,
-        total,
-        date: new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' })
-      });
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      history.unshift({ level, score, total, date: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short'}) });
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50))); // Limit history size
     }
 
     function showHistoryTab(level) {
@@ -658,7 +613,7 @@
       document.getElementById(`tab-${level}`).classList.add('active');
 
       const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-      const filtered = history.filter(h => h.level === level).slice().reverse();
+      const filtered = history.filter(h => h.level === level);
       historyLogContainerEl.innerHTML = '';
       if (filtered.length === 0) {
         historyLogContainerEl.innerHTML = `<p class="text-slate-500 dark:text-slate-400 text-center p-4">Nenhuma rodada jogada neste nível.</p>`;
@@ -668,26 +623,23 @@
         const info = classMap[entry.level] || { name: entry.level };
         const el = document.createElement('div');
         el.className = 'flex justify-between items-center text-sm p-3 bg-white dark:bg-slate-800/50 rounded-md shadow-sm mb-2';
-        el.innerHTML = `<div><strong class="mr-2">${info.name}</strong><span class="text-slate-600 dark:text-slate-200">${entry.score} / ${entry.total}</span></div><div class="text-xs text-slate-400">${entry.date}</div>`;
+        el.innerHTML = `<div><strong class="mr-2">${info.name}</strong><span class="text-slate-600 dark:text-slate-200">${entry.score}/${entry.total}</span></div><div class="text-xs text-slate-400">${entry.date}</div>`;
         historyLogContainerEl.appendChild(el);
       });
     }
     
     function clearHistory() {
-        showModal(
-            'Limpar Histórico?',
-            'Esta ação é irreversível e apagará todos os seus resultados salvos. Deseja continuar?',
+        showModal( 'Limpar Histórico?', 'Esta ação apagará todos os seus resultados. Deseja continuar?',
             [
                 { text: 'Cancelar', class: 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600', action: hideModal },
                 { text: 'Sim, Limpar', class: 'bg-red-600 text-white', action: () => {
                     localStorage.removeItem(HISTORY_KEY);
-                    showHistoryTab('medium');
+                    showHistoryTab(document.querySelector('.tab-button.active').id.replace('tab-',''));
                     hideModal();
                 }}
             ]
         );
     }
-
     /***********************************************
      * Modal System
      ***********************************************/
@@ -695,7 +647,6 @@
         modalTitleEl.textContent = title;
         modalBodyEl.innerHTML = body;
         modalActionsEl.innerHTML = '';
-        
         actions.forEach(action => {
             const btn = document.createElement('button');
             btn.textContent = action.text;
@@ -703,68 +654,67 @@
             btn.onclick = action.action;
             modalActionsEl.appendChild(btn);
         });
-
         modalEl.classList.add('visible');
     }
-
-    function hideModal() {
-        modalEl.classList.remove('visible');
-    }
-
+    function hideModal() { modalEl.classList.remove('visible'); }
     function showAbout() {
-        showModal(
-            'Sobre o Quiz',
-            '<p>Quiz de Computação em Nuvem II desenvolvido por <strong>MG Produções</strong> para fins didáticos.</p><p class="mt-2 text-sm">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">1</kbd>-<kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">4</kbd> selecionar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">N</kbd> próxima · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Esc</kbd> sair.</p>',
+        showModal( 'Sobre o Quiz', '<p>Quiz de Computação em Nuvem II desenvolvido por <strong>MG Produções</strong>.</p><p class="mt-2 text-sm">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">N</kbd> próxima · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Esc</kbd> sair.</p>',
             [{ text: 'Fechar', class: 'bg-sky-600 text-white', action: hideModal }]
         );
     }
-
     /***********************************************
-     * Keyboard accessibility
+     * Keyboard & Event Listeners
      ***********************************************/
     window.addEventListener('keydown', (e) => {
-      // Close modal with Escape key
-      if (e.key === 'Escape' && modalEl.classList.contains('visible')) {
-        hideModal();
+      if (modalEl.classList.contains('visible')) {
+        if (e.key === 'Escape') hideModal();
         return;
       }
       
       if (!gameScreen.classList.contains('hidden')) {
-        // In-game shortcuts
-        if (/^[1-4]$/.test(e.key) && !confirmButton.classList.contains('hidden')) {
-          e.preventDefault();
-          const idx = parseInt(e.key,10) - 1;
-          const btn = optionsAreaEl.children[idx];
-          if (btn) { btn.click(); btn.focus(); }
-        } else if (e.key === 'Enter') {
+        if (e.key === 'Enter') {
           e.preventDefault();
           if (!confirmButton.disabled) confirmButton.click();
           else if (!nextButton.classList.contains('hidden')) nextButton.click();
-        } else if (e.key.toLowerCase() === 'n') {
-          if (!nextButton.classList.contains('hidden')) nextButton.click();
+        } else if (e.key.toLowerCase() === 'n' && !nextButton.classList.contains('hidden')) {
+          nextButton.click();
         } else if (e.key === 'Escape') {
           exitGame();
         }
-        return;
-      }
-      
-      // If on start screen
-      if (!startScreen.classList.contains('hidden')) {
-        if (e.key === '1') startGame('medium');
-        if (e.key === '2') startGame('hard');
-        if (e.key === '3') startGame('university');
       }
     });
 
-    // Initial UI setup
-    (function initUI(){
-      setSound(soundEnabled);
-      showStartScreen();
-      modalEl.addEventListener('click', (e) => {
-          if (e.target === modalEl) hideModal();
-      });
-      document.getElementById('tab-medium').classList.add('active');
-    })();
+    /***********************************************
+     * App Initialization
+     ***********************************************/
+    document.addEventListener('DOMContentLoaded', () => {
+        // Theme Listener
+        themeToggle.addEventListener('click', () => {
+            applyTheme(!document.documentElement.classList.contains('dark'));
+        });
+
+        // Sound Listener
+        soundToggle.addEventListener('click', async () => {
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+                setupAudio();
+            }
+            setSound(!soundEnabled);
+        });
+
+        // Modal Close Listener
+        modalEl.addEventListener('click', (e) => {
+            if (e.target === modalEl) hideModal();
+        });
+
+        // Initial Setup
+        const preferDark = localStorage.getItem('color-theme') === 'dark' || (!localStorage.getItem('color-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        applyTheme(preferDark);
+        setSound(soundEnabled);
+        initPools();
+        showStartScreen();
+        document.getElementById('tab-medium').classList.add('active');
+    });
   </script>
 </body>
 </html>
