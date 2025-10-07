@@ -1,172 +1,191 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz de Computação em Nuvem II</title>
-    <meta name="description" content="Desafie seus conhecimentos em Computação em Nuvem com este quiz interativo! Níveis médio, difícil e universitário.">
-    <meta name="theme-color" content="#0ea5e9">
-    <meta property="og:title" content="Quiz de Computação em Nuvem | Teste seus conhecimentos!">
-    <meta property="og:description" content="Desafie-se com perguntas sobre AWS, Kubernetes, Serverless e mais. Você está pronto?">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1618335829737-2228915674e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80">
-    <meta property="og:url" content="https://maikongino.github.io/quiz/">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Quiz de Computação em Nuvem | Teste seus conhecimentos!">
-    <meta name="twitter:description" content="Desafie-se com perguntas sobre AWS, Kubernetes, Serverless e mais. Você está pronto?">
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1618335829737-2228915674e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz de Computação em Nuvem II — MG Produções</title>
+  <meta name="description" content="Desafie seus conhecimentos em Computação em Nuvem com este quiz interativo! Níveis médio, difícil e universitário." />
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --accent: #0ea5e9; --bg: #f1f5f9; --card: #ffffff; --text-dark: #0f1724; }
+    .dark { --bg: #0b1220; --card: #0f1724; --text-dark: #e6eef8; }
+    html,body { height: 100%; }
+    body { font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: var(--bg); color: var(--text-dark); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    .card { background: var(--card); border-radius: 16px; }
+    .focus-ring:focus-visible { box-shadow: 0 6px 18px rgba(14,165,233,.12); outline: none; border-radius: 10px; }
+    .quiz-option, .level-button, .action-button, .tab-button, .modal-button { transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, background-color .15s, border-color .15s; cursor: pointer; }
+    .quiz-option { background: #fff; border: 1px solid rgba(15,23,42,0.06); border-radius: 12px; padding: 16px; text-align:left; }
+    .quiz-option.selected { transform: translateY(-3px); border-width: 2px; border-color: var(--accent); box-shadow: 0 8px 20px rgba(2,6,23,0.06); }
+    .correct { background-color: #16a34a !important; color: white !important; border-color: #15803d !important; }
+    .incorrect { background-color: #dc2626 !important; color: white !important; border-color: #b91c1c !important; }
+    .confetti { position: absolute; width: 8px; height: 12px; opacity: 0.95; border-radius: 2px; will-change: transform, opacity; }
+    @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); } 100% { transform: translateY(120vh) rotate(720deg); opacity: 0; } }
+    .animated-gradient { background-image: linear-gradient(90deg,#38bdf8,#818cf8,#f472b6,#38bdf8); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation: gradient-animation 4s linear infinite; }
+    @keyframes gradient-animation { to { background-position:200% center; } }
+    .sr-only { position: absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    .shake { animation: shake 0.6s ease-in-out; }
+    @keyframes shake {
+      0%,100%{ transform: translateX(0); } 10%,30%,50%,70%{ transform: translateX(-6px);} 20%,40%,60%,80%{ transform: translateX(6px);}
+    }
+    .progress { height: 8px; background: rgba(0,0,0,0.06); border-radius: 999px; overflow: hidden; }
+    .progress > i { display:block; height:100%; background: linear-gradient(90deg,var(--accent),#7c3aed); width:0%; transition: width .45s ease; }
+    
+    /* Histórico */
+    .tab-button.active { background-color: var(--accent); color: white; border-color: var(--accent); }
+    .dark .tab-button.active { background-color: var(--accent); border-color: var(--accent); }
 
-    <style>
-        body { font-family: 'Poppins', sans-serif; }
-        .quiz-option, .level-button, .history-button, .action-button, .tab-button {
-            transition: all 0.2s ease-in-out;
-        }
-        .quiz-option:hover:not(:disabled), .level-button:hover, .history-button:hover, .action-button:hover:not(:disabled), .tab-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .quiz-option:active, .level-button:active, .history-button:active, .action-button:active:not(:disabled), .tab-button:active {
-            transform: translateY(0) scale(0.98);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        .quiz-option.selected {
-            border-color: #38bdf8; /* sky-400 */
-            background-color: #e0f2fe; /* sky-100 */
-            color: #0369a1; /* sky-700 */
-        }
-        .dark .quiz-option.selected {
-            background-color: #0c4a6e; /* sky-900 */
-            color: #e0f2fe; /* sky-100 */
-        }
-        .correct {
-            background-color: #22c55e !important; color: white !important; border-color: #16a34a !important;
-        }
-        .incorrect {
-            background-color: #ef4444 !important; color: white !important; border-color: #dc2626 !important;
-        }
-        .tab-button.active {
-            border-color: #0ea5e9; /* sky-500 */
-            background-color: #0ea5e9;
-            color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .animated-gradient {
-            background-image: linear-gradient(90deg, #38bdf8, #818cf8, #f472b6, #38bdf8);
-            background-size: 200% auto;
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradient-animation 4s linear infinite;
-        }
-        @keyframes gradient-animation {
-            to { background-position: 200% center; }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        .shake { animation: shake 0.5s ease-in-out; }
-        @keyframes fall {
-            0% { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
-        }
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            animation: fall 3s linear forwards;
-        }
+    /* Modal Styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; }
+    .modal-overlay.visible { opacity: 1; visibility: visible; }
+    .modal-content { background: var(--card); color: var(--text-dark); padding: 2rem; border-radius: 16px; width: 90%; max-width: 500px; transform: scale(0.95); transition: transform 0.3s ease; }
+    .modal-overlay.visible .modal-content { transform: scale(1); }
 
-        /* small accessibility helper */
-        .focus-ring:focus { outline: 3px solid rgba(14,165,233,0.18); outline-offset: 2px; }
-        .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
-    </style>
+    @media (max-width:640px){
+      .quiz-option { padding: 12px; font-size: 14px; }
+      .modal-content { padding: 1.5rem; }
+    }
+  </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 grid grid-rows-[1fr_auto] min-h-screen">
+<body class="min-h-screen grid place-items-center p-6">
 
-    <main class="w-full flex items-center justify-center p-4">
-        <div id="quiz-container" class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 relative z-10">
-            
-            <div id="animation-overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none z-50 rounded-2xl overflow-hidden"></div>
-            
-            <button id="theme-toggle" class="absolute top-4 right-4 p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" title="Alterar tema" aria-pressed="false">
-                <svg id="theme-toggle-dark-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                <svg id="theme-toggle-light-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-            </button>
+  <main class="w-full max-w-3xl card shadow-xl p-6 md:p-10 relative z-10">
+    <div id="animation-overlay" class="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl"></div>
 
-            <div id="start-screen" class="text-center">
-                <h1 class="text-3xl md:text-4xl font-bold text-sky-600 dark:text-sky-400 mb-4">Computação em Nuvem II ☁️</h1>
-                <p class="text-slate-600 dark:text-slate-400 mb-8 text-lg">Selecione o nível de dificuldade para começar ou veja seu histórico.</p>
-                <div class="grid grid-cols-1 gap-4 mb-6">
-                    <button data-level="medium" class="level-button w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 dark:focus-visible:ring-offset-slate-900">Nível Médio</button>
-                    <button data-level="hard" class="level-button w-full bg-amber-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-600 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 dark:focus-visible:ring-offset-slate-900">Nível Difícil</button>
-                    <button data-level="university" class="level-button w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 dark:focus-visible:ring-offset-slate-900">Hard (Universitário)</button>
-                </div>
-                <button id="btn-history" class="history-button w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-900">Ver Histórico de Estudos</button>
-            </div>
-
-            <div id="game-screen" class="hidden">
-                <div class="flex justify-between items-start border-b border-slate-200 dark:border-slate-700 pb-4 mb-6">
-                    <div>
-                        <h2 id="quiz-title" class="text-xl font-bold"></h2>
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Selecione a resposta correta.</p>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="text-right">
-                            <p class="text-sm font-medium">Questão</p>
-                            <p class="text-lg font-bold"><span id="current-question">1</span> / <span id="total-questions">1</span></p>
-                        </div>
-                        <button id="btn-exit" class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" title="Voltar ao Início">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                        </button>
-                    </div>
-                </div>
-                <div id="question-area" class="mb-6"><p id="question-text" class="text-lg md:text-xl font-semibold leading-relaxed"></p></div>
-                <div id="options-area" class="grid grid-cols-1 gap-4" role="radiogroup" aria-labelledby="question-text"></div>
-                <div id="action-area" class="mt-6 text-center h-14 flex items-center justify-center space-x-2">
-                    <button id="confirm-button" class="action-button w-1/2 bg-sky-600 text-white font-bold py-3 px-6 rounded-lg shadow-md disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" disabled>Confirmar</button>
-                    <button id="next-button" class="action-button w-1/2 bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500 dark:focus-visible:ring-offset-slate-800">Próxima</button>
-                </div>
-            </div>
-
-            <div id="end-screen" class="hidden text-center">
-                 <h2 class="text-3xl font-bold mb-4">Fim da Rodada!</h2>
-                 <p class="text-slate-600 dark:text-slate-400 text-xl mb-2">Sua pontuação foi:</p>
-                 <p id="final-score" class="text-6xl font-extrabold text-sky-600 dark:text-sky-400 mb-8"></p>
-                 <button id="btn-play-again" class="w-full bg-sky-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800">Jogar Novamente</button>
-            </div>
-
-            <div id="history-screen" class="hidden">
-                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-300">Histórico de Estudos</h2>
-                    <button id="btn-history-back" class="text-sm font-bold bg-slate-200 dark:bg-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-800">Voltar</button>
-                </div>
-                <div class="border-b border-slate-200 dark:border-slate-700 mb-4">
-                    <nav class="flex space-x-2" aria-label="Tabs">
-                        <button id="tab-medium" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Médio</button>
-                        <button id="tab-hard" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Difícil</button>
-                        <button id="tab-university" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Hard (Univ.)</button>
-                    </nav>
-                </div>
-                <div id="history-log-container" class="max-h-80 overflow-y-auto bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg space-y-2"></div>
-                <button id="btn-clear-history" class="mt-6 w-full text-sm text-center text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded">Limpar todo o histórico</button>
-            </div>
+    <header class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 grid place-items-center text-white font-extrabold text-xl">☁️</div>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-sky-600 dark:text-sky-400">Computação em Nuvem II</h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Teste seus conhecimentos — prático, rápido e didático.</p>
         </div>
-    </main>
-    <footer class="text-center p-4 text-slate-500 dark:text-slate-400 text-sm bg-slate-100 dark:bg-slate-900">
-        Desenvolvido por
-        <a href="https://portfoliomaikongino.web.app/" target="_blank" rel="noopener noreferrer" class="font-bold animated-gradient hover:opacity-80 transition-opacity">
-            MG Produções
-        </a>
-        - 2025
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="sound-toggle" class="focus-ring p-2 rounded-md" title="Ativar / Desativar som" aria-pressed="false">
+          <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M11 5L6 9H2v6h4l5 4V5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 9a4 4 0 010 6m2-10a8 8 0 010 14" /></svg>
+          <svg id="icon-sound-off" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500 dark:text-slate-400 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 9l-6 6M6 9v6h4l5 4V5L10 9H6z"/></svg>
+        </button>
+
+        <button id="theme-toggle" class="focus-ring p-2 rounded-md" title="Alterar tema" aria-pressed="false">
+          <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 dark:text-slate-300 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 dark:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6L19.8 4.2M12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section id="start-screen" class="space-y-5">
+      <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Selecione o nível de dificuldade para iniciar o quiz.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md hover:-translate-y-1" onclick="startGame('medium')" aria-label="Iniciar nível médio">
+          <div class="flex items-center justify-between">
+            <div class="text-left">
+              <div class="text-sm text-slate-500">Nível</div>
+              <div class="text-lg font-bold">Médio</div>
+            </div>
+            <div class="text-sky-600 text-2xl">⚙️</div>
+          </div>
+        </button>
+
+        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md hover:-translate-y-1" onclick="startGame('hard')" aria-label="Iniciar nível difícil">
+          <div class="flex items-center justify-between">
+            <div class="text-left">
+              <div class="text-sm text-slate-500">Nível</div>
+              <div class="text-lg font-bold">Difícil</div>
+            </div>
+            <div class="text-amber-500 text-2xl">🔥</div>
+          </div>
+        </button>
+
+        <button class="level-button focus-ring bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md hover:-translate-y-1" onclick="startGame('university')" aria-label="Iniciar nível universitário">
+          <div class="flex items-center justify-between">
+            <div class="text-left">
+              <div class="text-sm text-slate-500">Nível</div>
+              <div class="text-lg font-bold">Universitário</div>
+            </div>
+            <div class="text-red-600 text-2xl">🎓</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="showHistoryScreen()" class="action-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold hover:bg-sky-700">Ver Histórico</button>
+        <button onclick="showAbout()" class="action-button focus-ring px-4 py-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">Sobre</button>
+      </div>
+    </section>
+
+    <section id="game-screen" class="hidden space-y-4" aria-hidden="true">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 id="quiz-title" class="text-lg font-bold"></h2>
+          <p id="quiz-sub" class="text-sm text-slate-500 dark:text-slate-400">Selecione a resposta correta.</p>
+        </div>
+        <div class="w-48">
+          <div class="text-sm text-slate-500">Progresso</div>
+          <div class="progress mt-1" aria-hidden="true"><i id="progress-bar"></i></div>
+        </div>
+      </div>
+
+      <div id="question-area" class="p-4 rounded-lg border border-slate-100 dark:border-slate-700">
+        <p id="question-text" class="text-lg md:text-xl font-semibold leading-relaxed"></p>
+      </div>
+
+      <div id="options-area" class="grid gap-3"></div>
+
+      <div class="flex items-center gap-3 mt-2">
+        <button id="confirm-button" onclick="confirmAnswer()" class="action-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold disabled:opacity-50 disabled:cursor-not-allowed" disabled>Confirmar</button>
+        <button id="next-button" onclick="nextQuestion()" class="hidden action-button focus-ring flex-1 bg-emerald-600 text-white rounded-lg py-3 font-bold">Próxima</button>
+        <button onclick="exitGame()" class="action-button p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">Sair</button>
+      </div>
+
+      <div class="text-sm text-slate-500 mt-1">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">N</kbd> próxima</div>
+    </section>
+
+    <section id="end-screen" class="hidden text-center space-y-4" aria-hidden="true">
+      <h2 class="text-3xl font-bold">Fim da Rodada 🎉</h2>
+      <p class="text-slate-600 dark:text-slate-400">Sua pontuação:</p>
+      <div id="final-score" class="text-5xl font-extrabold text-sky-600"></div>
+      <div class="flex gap-3">
+        <button onclick="showStartScreen()" class="action-button flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-3">Voltar ao início</button>
+        <button id="replay-button" class="action-button flex-1 bg-sky-600 text-white rounded-lg py-3">Jogar novamente</button>
+      </div>
+    </section>
+
+    <section id="history-screen" class="hidden" aria-hidden="true">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Histórico de Estudos</h2>
+        <div class="flex gap-2">
+          <button onclick="clearHistory()" class="text-sm text-red-500 hover:underline">Limpar tudo</button>
+          <button onclick="showStartScreen()" class="action-button text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">Voltar</button>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-3 mb-4">
+        <button id="tab-medium" class="tab-button focus-ring rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2" onclick="showHistoryTab('medium')">Médio</button>
+        <button id="tab-hard" class="tab-button focus-ring rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2" onclick="showHistoryTab('hard')">Difícil</button>
+        <button id="tab-university" class="tab-button focus-ring rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2" onclick="showHistoryTab('university')">Univ.</button>
+      </div>
+
+      <div id="history-log-container" class="bg-slate-50 dark:bg-slate-900/40 p-4 rounded-lg max-h-64 overflow-y-auto"></div>
+    </section>
+
+    <footer class="mt-6 text-sm text-slate-500 dark:text-slate-400 text-center">
+      Desenvolvido por <a href="https://portfoliomaikongino.web.app/" target="_blank" rel="noopener noreferrer" class="animated-gradient font-bold">MG Produções</a> — 2025
     </footer>
+  </main>
+
+  <div id="modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content space-y-4">
+      <h3 id="modal-title" class="text-2xl font-bold"></h3>
+      <div id="modal-body" class="text-slate-600 dark:text-slate-400"></div>
+      <div id="modal-actions" class="flex gap-3 justify-end"></div>
+    </div>
+  </div>
       <script>
         const questions = {
             medium: [
@@ -323,412 +342,378 @@
             ]
         };
     
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+  let pools = {};
+    let currentDifficulty = null;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let selectedOption = null;
+    let currentScore = 0;
+    const DEFAULT_TOTAL = 10;
+    const classMap = {
+      medium: { name: 'Nível Médio 📚', titleClass: 'text-blue-600 dark:text-blue-400' },
+      hard: { name: 'Nível Difícil ✒️', titleClass: 'text-amber-500 dark:text-amber-400' },
+      university: { name: 'Nível Universitário 🎓', titleClass: 'text-red-600 dark:text-red-400' }
+    };
 
+    /***********************************************
+     * DOM Elements
+     ***********************************************/
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
     const endScreen = document.getElementById('end-screen');
     const historyScreen = document.getElementById('history-screen');
-
-    const quizTitle = document.getElementById('quiz-title');
-    const questionText = document.getElementById('question-text');
-    const optionsArea = document.getElementById('options-area');
+    const quizTitleEl = document.getElementById('quiz-title');
+    const progressBar = document.getElementById('progress-bar');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsAreaEl = document.getElementById('options-area');
     const confirmButton = document.getElementById('confirm-button');
     const nextButton = document.getElementById('next-button');
-    const finalScore = document.getElementById('final-score');
-    const currentQuestionEl = document.getElementById('current-question');
-    const totalQuestionsEl = document.getElementById('total-questions');
-
-    const btnHistory = document.getElementById('btn-history');
-    const btnHistoryBack = document.getElementById('btn-history-back');
-    const tabMedium = document.getElementById('tab-medium');
-    const tabHard = document.getElementById('tab-hard');
-    const tabUniversity = document.getElementById('tab-university');
-    const historyLogContainer = document.getElementById('history-log-container');
-    const btnClearHistory = document.getElementById('btn-clear-history');
-
-    const btnExit = document.getElementById('btn-exit');
-    const btnPlayAgain = document.getElementById('btn-play-again');
-    const btnPlayAgainSmall = document.getElementById('btn-play-again');
-
+    const finalScoreEl = document.getElementById('final-score');
+    const historyLogContainerEl = document.getElementById('history-log-container');
     const animationOverlay = document.getElementById('animation-overlay');
+    const replayButton = document.getElementById('replay-button');
+    const themeToggle = document.getElementById('theme-toggle');
+    const iconMoon = document.getElementById('icon-moon');
+    const iconSun = document.getElementById('icon-sun');
+    const soundToggle = document.getElementById('sound-toggle');
+    const soundOnIcon = document.getElementById('icon-sound-on');
+    const soundOffIcon = document.getElementById('icon-sound-off');
+    const modalEl = document.getElementById('modal');
+    const modalTitleEl = document.getElementById('modal-title');
+    const modalBodyEl = document.getElementById('modal-body');
+    const modalActionsEl = document.getElementById('modal-actions');
 
-    // Theme init
+    /***********************************************
+     * Áudio (Tone.js)
+     ***********************************************/
+    let synthClick = null;
+    let synthCorrect = null;
+    let synthIncorrect = null;
+    let soundEnabled = localStorage.getItem('quiz-sound-enabled') !== 'false';
+
+    function setupAudio() {
+      if (synthClick) return;
+      try {
+        synthClick = new Tone.Synth({ envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.1 } }).toDestination();
+        synthCorrect = new Tone.PolySynth(Tone.Synth).toDestination();
+        synthIncorrect = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, release: 0.2 } }).toDestination();
+      } catch(e) { console.error("Tone.js failed to initialize:", e); }
+    }
+    function setSound(on) {
+      soundEnabled = on;
+      soundOnIcon.classList.toggle('hidden', !on);
+      soundOffIcon.classList.toggle('hidden', on);
+      soundToggle.setAttribute('aria-pressed', String(on));
+      localStorage.setItem('quiz-sound-enabled', String(on));
+    }
+    function playClick() { if (!soundEnabled || !synthClick) return; try { synthClick.triggerAttackRelease('E4', '8n'); } catch(e){} }
+    function playCorrect() { if (!soundEnabled || !synthCorrect) return; try { synthCorrect.triggerAttackRelease(["C4","E4","G4"], "8n"); } catch(e){} }
+    function playWrong() { if (!soundEnabled || !synthIncorrect) return; try { synthIncorrect.triggerAttackRelease("C3", "8n"); } catch(e){} }
+
+    /***********************************************
+     * Theme
+     ***********************************************/
     function applyTheme(isDark) {
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-            themeToggleLightIcon.classList.remove('hidden');
-            themeToggleDarkIcon.classList.add('hidden');
-        } else {
-            document.documentElement.classList.remove('dark');
-            themeToggleLightIcon.classList.add('hidden');
-            themeToggleDarkIcon.classList.remove('hidden');
-        }
-    }
-    const isDarkMode = localStorage.getItem('color-theme') === 'dark' ||
-                       (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    applyTheme(isDarkMode);
-
-    themeToggleBtn.addEventListener('click', () => {
-        const isCurrentlyDark = document.documentElement.classList.contains('dark');
-        localStorage.setItem('color-theme', isCurrentlyDark ? 'light' : 'dark');
-        applyTheme(!isCurrentlyDark);
-    });
-
-    // Questions (PARTE 1 + PARTE 2 unidas)
-    const questions = {
-        medium: [
-            { question: "Qual é a abstração fundamental do Amazon EC2?", options: ["Um contêiner leve e portátil.", "Uma Máquina Virtual (VM) na infraestrutura da AWS.", "Uma função serverless que executa código sob demanda.", "Um banco de dados relacional totalmente gerenciado."], answer: "Uma Máquina Virtual (VM) na infraestrutura da AWS." },
-            { question: "O que é uma 'Task Definition' no Amazon ECS?", options: ["Um documento que especifica a imagem Docker e os recursos para um contêiner.", "Uma regra de firewall virtual que controla o tráfego de rede para as instâncias.", "Um modelo pré-configurado para instâncias EC2, incluindo SO e software.", "Um script que automatiza a implantação de aplicações em um ambiente PaaS."], answer: "Um documento que especifica a imagem Docker e os recursos para um contêiner." },
-            { question: "Qual é a principal característica da computação Serverless?", options: ["O desenvolvedor gerencia manualmente a escalabilidade dos servidores.", "O provedor de nuvem gerencia dinamicamente a alocação de recursos.", "A cobrança é feita por um valor fixo mensal, independentemente do uso.", "As aplicações são executadas em servidores on-premises do cliente."], answer: "O provedor de nuvem gerencia dinamicamente a alocação de recursos." },
-            { question: "No Kubernetes, qual componente do Control Plane armazena todos os dados do cluster?", options: ["API Server", "Scheduler", "etcd", "Controller Manager"], answer: "etcd" },
-            { question: "Qual serviço da AWS corresponde a um modelo PaaS (Plataforma como Serviço)?", options: ["Amazon EC2", "Amazon S3", "AWS Lambda", "Amazon Elastic Beanstalk"], answer: "Amazon Elastic Beanstalk" },
-            { question: "O que é 'Infraestrutura como Código' (IaC)?", options: ["A prática de escrever o código da aplicação em uma linguagem de baixo nível.", "O gerenciamento de infraestrutura através de código e arquivos de configuração.", "A configuração manual de servidores usando uma interface gráfica web.", "O monitoramento do desempenho da aplicação por meio de logs e métricas."], answer: "O gerenciamento de infraestrutura através de código e arquivos de configuração." },
-            { question: "Qual a função de um 'Security Group' no contexto do Amazon EC2?", options: ["Balancear a carga de tráfego entre múltiplas instâncias para alta disponibilidade.", "Fornecer armazenamento persistente de dados para as instâncias, como um disco rígido.", "Atuar como um firewall virtual, controlando o tráfego de entrada e saída.", "Armazenar imagens de contêiner para serem usadas pelo Amazon ECS."], answer: "Atuar como um firewall virtual, controlando o tráfego de entrada e saída." },
-            { question: "No Kubernetes, qual é a menor unidade de implantação?", options: ["Nó (Node)", "Serviço (Service)", "Pod", "Cluster"], answer: "Pod" },
-            { question: "O que significa dizer que uma arquitetura é 'Event-Driven' (Orientada a Eventos)?", options: ["Que o código é executado em intervalos de tempo fixos, definidos pelo desenvolvedor.", "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo.", "Que a aplicação só pode ser acessada através de uma API RESTful.", "Que a infraestrutura é provisionada manualmente antes da execução do código."], answer: "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo." },
-            { question: "Qual o objetivo principal do AWS IAM (Identity and Access Management)?", options: ["Monitorar as métricas de desempenho dos recursos da AWS, como CPU e memória.", "Controlar o acesso aos recursos da AWS, definindo permissões para usuários e serviços.", "Orquestrar a implantação de contêineres em um cluster de instâncias EC2.", "Fornecer uma rede virtual isolada para lançar recursos da AWS com segurança."], answer: "Controlar o acesso aos recursos da AWS, definindo permissões para usuários e serviços." },
-            { question: "O que é uma AMI (Amazon Machine Image)?", options: ["Um serviço de banco de dados NoSQL totalmente gerenciado pela AWS.", "Um modelo pré-configurado para instâncias EC2, contendo SO e software.", "Uma interface de linha de comando para interagir com os serviços da AWS.", "Um contêiner Docker otimizado para rodar em ambientes da Amazon."], answer: "Um modelo pré-configurado para instâncias EC2, contendo SO e software." },
-            { question: "Qual é o principal propósito do Amazon S3 (Simple Storage Service)?", options: ["Executar código de aplicação em resposta a eventos de forma serverless.", "Fornecer poder computacional escalável na forma de máquinas virtuais.", "Armazenar e recuperar qualquer quantidade de dados, a qualquer momento, de qualquer lugar.", "Oferecer um serviço de banco de dados relacional gerenciado com alta disponibilidade."], answer: "Armazenar e recuperar qualquer quantidade de dados, a qualquer momento, de qualquer lugar." },
-            { question: "No contexto da AWS, o que é uma VPC (Virtual Private Cloud)?", options: ["Um data center físico localizado em uma região geográfica específica.", "Uma rede virtual logicamente isolada dentro da nuvem da AWS.", "Um serviço de balanceamento de carga que distribui o tráfego de entrada.", "Um contêiner que agrupa uma ou mais aplicações para implantação."], answer: "Uma rede virtual logicamente isolada dentro da nuvem da AWS." },
-            { question: "Qual a função do AWS Auto Scaling?", options: ["Realizar backups automáticos de bancos de dados RDS em horários pré-definidos.", "Ajustar automaticamente o número de instâncias EC2 com base na demanda.", "Criptografar automaticamente os dados armazenados em volumes EBS.", "Distribuir o tráfego de rede entre diferentes Zonas de Disponibilidade."], answer: "Ajustar automaticamente o número de instâncias EC2 com base na demanda." },
-            { question: "Qual componente do Kubernetes é responsável por expor a API do cluster?", options: ["etcd", "Scheduler", "API Server", "Kubelet"], answer: "API Server" },
-            { question: "O que é 'Integração Contínua' (CI)?", options: ["A prática de implantar o software em produção após cada alteração no código.", "O processo de mesclar frequentemente alterações de código em um repositório central.", "A configuração manual de novos servidores para cada nova versão do software.", "A entrega do software em um pacote físico para o cliente final."], answer: "O processo de mesclar frequentemente alterações de código em um repositório central." },
-            { question: "Qual é a principal vantagem dos contêineres sobre as VMs?", options: ["Contêineres são mais pesados, pois incluem uma cópia completa do SO.", "Contêineres são mais leves e rápidos, pois compartilham o kernel do SO do host.", "VMs são mais portáteis, pois não dependem do sistema operacional hospedeiro.", "VMs iniciam em segundos, enquanto contêineres levam vários minutos."], answer: "Contêineres são mais leves e rápidos, pois compartilham o kernel do SO do host." },
-            { question: "Para que serve o serviço Amazon CloudWatch?", options: ["Para gerenciar identidades de usuários e suas permissões de acesso.", "Para armazenar objetos, como imagens e vídeos, de forma escalável.", "Para monitorar métricas e logs dos recursos e aplicações na AWS.", "Para provisionar e gerenciar bancos de dados relacionais na nuvem."], answer: "Para monitorar métricas e logs dos recursos e aplicações na AWS." },
-            { question: "O que define um modelo de cobrança 'Baseado em Consumo'?", options: ["Um pagamento mensal fixo, independentemente da quantidade de recursos utilizados.", "O custo é definido pelo volume de recursos computacionais utilizados.", "O preço é atrelado a indicadores de desempenho do negócio (KPIs).", "Uma combinação de pagamento fixo com cobrança por uso excedente."], answer: "O custo é definido pelo volume de recursos computacionais utilizados." },
-            { question: "Qual a função de uma 'Route Table' (Tabela de Rotas) em uma VPC?", options: ["Filtrar o tráfego de entrada e saída de uma instância, como um firewall.", "Conectar duas VPCs para permitir a comunicação direta entre elas.", "Determinar para onde o tráfego de rede de uma sub-rede deve ser direcionado.", "Traduzir endereços de rede privados para públicos para acesso à internet."], answer: "Determinar para onde o tráfego de rede de uma sub-rede deve ser direcionado." },
-            { question: "O que é um modelo de cobrança Híbrido na nuvem?", options: ["Cobrança baseada exclusivamente em KPIs de negócio.", "Uma combinação de diferentes modelos, como assinatura e consumo.", "Um pagamento único vitalício pelo acesso aos serviços da nuvem.", "Cobrança baseada no número de usuários ativos na plataforma."], answer: "Uma combinação de diferentes modelos, como assinatura e consumo." },
-            { question: "Qual o propósito principal do Amazon EBS (Elastic Block Store)?", options: ["Armazenar objetos estáticos como imagens e vídeos para acesso via web.", "Fornecer armazenamento de bloco persistente para instâncias EC2.", "Executar funções de código sem gerenciar servidores ou infraestrutura.", "Monitorar e coletar logs de todos os serviços da AWS em um local centralizado."], answer: "Fornecer armazenamento de bloco persistente para instâncias EC2." },
-            { question: "Qual a unidade básica de implantação no AWS Lambda?", options: ["Contêiner", "Máquina Virtual", "Função", "Pod"], answer: "Função" },
-            { question: "Qual o principal serviço da AWS para orquestração de contêineres?", options: ["AWS Lambda", "Amazon EC2", "Amazon ECS", "Amazon S3"], answer: "Amazon ECS" },
-            { question: "O que o Amazon RDS (Relational Database Service) gerencia?", options: ["Aplicações web completas, incluindo o código e a infraestrutura.", "Bancos de dados relacionais, automatizando tarefas como backups e patches.", "Contêineres Docker, gerenciando seu ciclo de vida e escalabilidade.", "O armazenamento de objetos em buckets para alta durabilidade."], answer: "Bancos de dados relacionais, automatizando tarefas como backups e patches." },
-            { question: "O que é um 'SLA' (Service Level Agreement)?", options: ["Um modelo de cobrança baseado em indicadores de desempenho.", "Um acordo que garante níveis de desempenho de um serviço.", "Uma ferramenta para automatizar a implantação de infraestrutura.", "Um tipo de firewall virtual para controlar o tráfego de rede."], answer: "Um acordo que garante níveis de desempenho de um serviço." },
-            { question: "Qual componente do Kubernetes seleciona o nó ideal para um novo Pod?", options: ["API Server", "etcd", "Controller Manager", "Scheduler"], answer: "Scheduler" },
-            { question: "O que o termo 'cloud-native' significa?", options: ["Aplicações legadas que foram movidas para a nuvem sem modificações.", "Um paradigma para construir aplicações que aproveitam a nuvem.", "Um software que só pode ser executado em um único provedor de nuvem.", "A prática de evitar o uso de contêineres em ambientes de produção."], answer: "Um paradigma para construir aplicações que aproveitam a nuvem." },
-            { question: "Qual a melhor prática de segurança recomendada para o AWS IAM?", options: ["Compartilhar a senha do usuário root com toda a equipe de desenvolvimento.", "Habilitar a autenticação multifator (MFA) para os usuários.", "Atribuir permissões de administrador a todos os novos usuários por padrão.", "Nunca rotacionar as chaves de acesso programático para evitar quebras."], answer: "Habilitar a autenticação multifator (MFA) para os usuários." },
-            { question: "O que é um 'Pod' no Kubernetes?", options: ["A maior unidade de gerenciamento, representando o cluster inteiro.", "Um conjunto de nós de trabalho que executam as aplicações.", "A menor e mais simples unidade no modelo de objetos do Kubernetes.", "Um balanceador de carga que distribui o tráfego entre contêineres."], answer: "A menor e mais simples unidade no modelo de objetos do Kubernetes." },
-            { question: "Qual a função do Kube-proxy no Kubernetes?", options: ["Garantir que os contêineres estejam em execução em um nó.", "Manter as regras de rede nos nós, permitindo a comunicação.", "Armazenar o estado desejado de todos os objetos do cluster.", "Tomar decisões globais sobre o agendamento de novos pods."], answer: "Manter as regras de rede nos nós, permitindo a comunicação." },
-            { question: "O que é o Azure Container Registry (ACR)?", options: ["Um serviço para executar contêineres de forma serverless no Azure.", "Um registro privado para armazenar e gerenciar imagens de contêiner.", "Uma ferramenta para monitorar o desempenho de clusters AKS.", "Um orquestrador de contêineres alternativo ao Kubernetes."], answer: "Um registro privado para armazenar e gerenciar imagens de contêiner." },
-            { question: "Qual o principal diferencial do Google Kubernetes Engine (GKE)?", options: ["É o único serviço que oferece um control plane gratuito.", "Seus dois modos de operação: Standard e Autopilot.", "Sua integração nativa e exclusiva com o Microsoft Entra ID.", "Não suporta autoescalonamento de nós, apenas de pods."], answer: "Seus dois modos de operação: Standard e Autopilot." },
-            { question: "O que caracteriza uma aplicação em nuvem?", options: ["Um programa que só pode ser executado em um computador desktop.", "Um software que reside e é executado na infraestrutura de um provedor de nuvem.", "Uma aplicação que não requer acesso à internet para funcionar.", "Um sistema legado que opera exclusivamente em um mainframe."], answer: "Um software que reside e é executado na infraestrutura de um provedor de nuvem." },
-            { question: "Qual modelo de serviço de nuvem o Amazon Elastic Beanstalk representa?", options: ["IaaS (Infraestrutura como Serviço)", "SaaS (Software como Serviço)", "PaaS (Plataforma como Serviço)", "FaaS (Função como Serviço)"], answer: "PaaS (Plataforma como Serviço)" },
-            { question: "Qual o principal benefício do 'self-healing' no Kubernetes?", options: ["Ele previne falhas de hardware antes que ocorram.", "Ele reinicia contêineres que falham e os reagenda se um nó cair.", "Ele corrige bugs no código da aplicação automaticamente.", "Ele otimiza o código para reduzir o consumo de CPU."], answer: "Ele reinicia contêineres que falham e os reagenda se um nó cair." },
-            { question: "O que é uma 'Política IAM' (IAM Policy)?", options: ["Um documento que define quem pode fazer o quê em quais recursos.", "Um conjunto de credenciais de acesso temporárias para um serviço.", "Um usuário virtual com permissões de administrador no IAM.", "Uma regra de firewall que se aplica a um grupo de instâncias EC2."], answer: "Um documento que define quem pode fazer o quê em quais recursos." },
-            { question: "Qual é um exemplo de banco de dados NÃO suportado pelo Amazon RDS?", options: ["PostgreSQL", "MySQL", "MongoDB", "Oracle"], answer: "MongoDB" },
-            { question: "O que é o conceito de 'portabilidade' em contêineres?", options: ["A capacidade de um contêiner ser executado de forma consistente em qualquer ambiente.", "A limitação de um contêiner a um único tipo de sistema operacional.", "A necessidade de reescrever o código da aplicação para cada provedor de nuvem.", "A velocidade com que um contêiner pode ser iniciado ou parado."], answer: "A capacidade de um contêiner ser executado de forma consistente em qualquer ambiente." },
-            { question: "O que o Azure Functions usa para se conectar a outros serviços de forma declarativa?", options: ["SDKs complexos", "Arquivos YAML", "Bindings", "API Gateway"], answer: "Bindings" },
-            { question: "Qual o principal objetivo da 'Entrega Contínua' (CD)?", options: ["Automatizar a detecção de erros de integração de código.", "Automatizar o lançamento de código validado para um ambiente.", "Gerenciar manualmente a infraestrutura de produção.", "Escrever testes unitários para cada nova funcionalidade."], answer: "Automatizar o lançamento de código validado para um ambiente." }
-        ],
-        hard: [
-            { question: "Qual a diferença entre os modos 'AWS Fargate' e 'EC2' no Amazon ECS?", options: ["Fargate exige que o usuário gerencie as instâncias EC2, enquanto o modo EC2 é serverless.", "O modo EC2 é mais caro e oferece menos controle granular sobre a rede e o armazenamento.", "Fargate é uma opção serverless que abstrai a gestão de servidores, enquanto o modo EC2 não.", "O modo Fargate é projetado para aplicações com estado, e o modo EC2 para as sem estado."], answer: "Fargate é uma opção serverless que abstrai a gestão de servidores, enquanto o modo EC2 não." },
-            { question: "Como uma 'Role' no AWS IAM se diferencia de um 'User'?", options: ["Um Usuário tem credenciais permanentes, enquanto uma Função assume permissões temporárias.", "Uma Função não pode ter políticas de permissão anexadas, ao contrário de um Usuário.", "Um Usuário representa um serviço da AWS, e uma Função representa uma pessoa.", "Funções são usadas para acesso via console, e Usuários para acesso programático via API."], answer: "Um Usuário tem credenciais permanentes, enquanto uma Função assume permissões temporárias." },
-            { question: "Qual a diferença fundamental entre a abordagem 'declarativa' e 'imperativa' em IaC?", options: ["A imperativa define o estado final ('o quê'), e a declarativa define os passos ('como').", "A declarativa define o estado final ('o quê'), e a imperativa define os passos ('como').", "Apenas a abordagem imperativa pode ser versionada em um repositório Git.", "Terraform é uma ferramenta imperativa, enquanto scripts de shell são declarativos."], answer: "A declarativa define o estado final ('o quê'), e a imperativa define os passos ('como')." },
-            { question: "No Amazon RDS, o que o recurso 'Multi-AZ' oferece?", options: ["A capacidade de escalar a capacidade de leitura do banco de dados criando réplicas.", "Backups automatizados do banco de dados para recuperação em um ponto no tempo.", "Alta disponibilidade, mantendo uma réplica de standby em outra Zona de Disponibilidade.", "Isolamento de rede para o banco de dados dentro de uma Virtual Private Cloud (VPC)."], answer: "Alta disponibilidade, mantendo uma réplica de standby em outra Zona de Disponibilidade." },
-            { question: "O que é o desafio de 'Vendor Lock-in' no contexto Serverless?", options: ["Uma falha de segurança que bloqueia o acesso do fornecedor aos seus recursos na nuvem.", "A facilidade de migrar funções entre provedores devido à padronização das APIs.", "A dificuldade de migração devido ao acoplamento das funções a serviços do provedor.", "Um modelo de cobrança que prende o cliente a um contrato de longo prazo sem flexibilidade."], answer: "A dificuldade de migração devido ao acoplamento das funções a serviços do provedor." },
-            { question: "Como o EKS Anywhere expande as capacidades do Amazon EKS?", options: ["Ele permite criar e operar clusters Kubernetes em servidores on-premises do cliente.", "É uma versão mais barata do EKS, projetada para ambientes de desenvolvimento.", "Ele automatiza a gestão dos worker nodes, tornando o EKS totalmente serverless.", "É uma ferramenta de monitoramento que fornece observabilidade para clusters EKS."], answer: "Ele permite criar e operar clusters Kubernetes em servidores on-premises do cliente." },
-            { question: "Qual a diferença entre 'Entrega Contínua' e 'Implantação Contínua'?", options: ["A Entrega Contínua automatiza o deploy em produção, enquanto a Implantação Contínua não.", "A Implantação Contínua é um processo manual, enquanto a Entrega Contínua é automatizada.", "A Entrega Contínua requer uma aprovação manual para o deploy em produção; a Implantação não.", "Não há diferença, os termos são usados de forma intercambiável na indústria."], answer: "A Entrega Contínua requer uma aprovação manual para o deploy em produção; a Implantação não." },
-            { question: "Qual a função de um 'NAT Gateway' em uma Amazon VPC?", options: ["Conectar duas VPCs para permitir a comunicação direta e privada entre elas.", "Permitir que recursos em sub-redes privadas acessem a internet de forma segura.", "Determinar o caminho do tráfego de rede, agindo como um roteador virtual.", "Atuar como um firewall no nível da sub-rede, controlando o tráfego de entrada e saída."], answer: "Permitir que recursos em sub-redes privadas acessem a internet de forma segura." }
-        ],
-        university: [
-            { question: "Como o modelo de cobrança 'pay-per-use' do Serverless alinha os custos da nuvem ao valor de negócio?", options: ["Garantindo um custo fixo mensal, o que facilita o planejamento orçamentário da empresa.", "Cobrando apenas quando o código está em execução, eliminando custos por tempo ocioso.", "Baseando o custo no número de servidores provisionados, independentemente do tráfego.", "Exigindo contratos de longo prazo que oferecem descontos progressivos com o uso."], answer: "Cobrando apenas quando o código está em execução, eliminando custos por tempo ocioso." },
-            { question: "Qual a principal trade-off ao escolher entre GKE Autopilot e AKS com Node Pools?", options: ["O Autopilot oferece controle granular sobre os nós, enquanto o AKS abstrai a infraestrutura.", "O GKE Autopilot oferece automação máxima, enquanto Node Pools oferecem mais controle.", "O AKS com Node Pools tem um modelo operacional serverless, ao contrário do Autopilot.", "O Autopilot é mais adequado para aplicações com estado, e o AKS para as sem estado."], answer: "O GKE Autopilot oferece automação máxima, enquanto Node Pools oferecem mais controle." },
-            { question: "Por que a 'descoberta de serviço' é um desafio que o Kubernetes resolve nativamente?", options: ["Porque os microsserviços têm IPs fixos, e o Kubernetes os mapeia para nomes DNS.", "O Kubernetes atribui IPs dinâmicos aos pods e usa um objeto 'Service' para um acesso estável.", "O Kubernetes exige que cada serviço conheça previamente o endereço IP dos outros.", "Este não é um desafio real, pois os pods se comunicam usando broadcast na rede."], answer: "O Kubernetes atribui IPs dinâmicos aos pods e usa um objeto 'Service' para um acesso estável." },
-            { question: "O que é 'GitOps' e como ele aprimora as práticas de DevOps?", options: ["É uma prática onde o Git é usado apenas para o código, e a infraestrutura é gerenciada via UI.", "Um paradigma onde o Git é a fonte da verdade para o código e a infraestrutura.", "É o uso de uma interface gráfica do Git para realizar implantações manuais no cluster.", "Uma metodologia que substitui o CI/CD, focando apenas na automação da infraestrutura."], answer: "Um paradigma onde o Git é a fonte da verdade para o código e a infraestrutura." },
-            { question: "Qual o papel do 'Controller Manager' no Control Plane do Kubernetes?", options: ["Agendar os pods nos nós com base nos recursos disponíveis e nas restrições.", "Ser o ponto de entrada da API que valida e processa todas as requisições.", "Executar processos que reconciliam o estado atual com o estado desejado.", "Armazenar de forma confiável todo o estado do cluster no banco de dados."], answer: "Executar processos que reconciliam o estado atual com o estado desejado." },
-            { question: "O que é o conceito de 'configuration drift' e como a IaC ajuda a eliminá-lo?", options: ["É a melhoria contínua da configuração, que é o objetivo principal da IaC.", "São as divergências entre ambientes, que a IaC evita ao permitir a repetibilidade.", "É um desvio no código da aplicação que causa falhas na infraestrutura.", "Refere-se à mudança de provedor de nuvem, um processo que a IaC não gerencia."], answer: "São as divergências entre ambientes, que a IaC evita ao permitir a repetibilidade." },
-            { question: "Qual a diferença entre 'Backend as a Service' (BaaS) e 'Function as a Service' (FaaS)?", options: ["BaaS é a parte de computação, enquanto FaaS fornece funcionalidades prontas.", "FaaS permite executar código, enquanto BaaS oferece serviços prontos como autenticação.", "Não há diferença, são termos intercambiáveis para a mesma tecnologia serverless.", "BaaS é para aplicações com estado, e FaaS para aplicações sem estado."], answer: "FaaS permite executar código, enquanto BaaS oferece serviços prontos como autenticação." },
-            { question: "Qual a principal filosofia por trás da estratégia de implantação 'Canary'?", options: ["Substituir completamente a versão antiga pela nova de uma só vez.", "Manter dois ambientes de produção idênticos e alternar o tráfego.", "Liberar uma nova versão para um pequeno subconjunto de usuários primeiro.", "Realizar a implantação da nova versão apenas durante a noite."], answer: "Liberar uma nova versão para um pequeno subconjunto de usuários primeiro." },
-            { question: "Como o EKS garante alta disponibilidade do Control Plane?", options: ["Executando todos os componentes do control plane em uma única e potente instância EC2.", "Distribuindo automaticamente o plano de controle por múltiplas Zonas de Disponibilidade.", "Exigindo que o usuário configure manualmente um cluster de failover em outra região.", "Utilizando o AWS Lambda para reiniciar os componentes do control plane em caso de falha."], answer: "Distribuindo automaticamente o plano de controle por múltiplas Zonas de Disponibilidade." },
-            { question: "O que é o problema de 'Denial of Wallet' no contexto Serverless?", options: ["Uma falha de segurança que permite o roubo de credenciais de pagamento da conta.", "A recusa do provedor em processar o pagamento, bloqueando os serviços.", "Uma fatura inesperadamente alta devido a um pico de invocações de funções.", "A incapacidade da plataforma de escalar, resultando em perda de receita."], answer: "Uma fatura inesperadamente alta devido a um pico de invocações de funções." },
-            { question: "A extensibilidade do Kubernetes via 'Operators' o transforma em quê?", options: ["Um substituto direto para as plataformas FaaS, tornando o serverless obsoleto.", "Apenas um orquestrador de contêineres, focado em agendamento de pods.", "Um plano de controle universal e orientado por API para a infraestrutura.", "Um sistema operacional de data center que substitui o kernel do Linux."], answer: "Um plano de controle universal e orientado por API para a infraestrutura." },
-            { question: "Qual a diferença entre a escalabilidade no Kubernetes e a escalabilidade no Serverless (FaaS)?", options: ["O Kubernetes escala de zero instantaneamente, enquanto o Serverless tem um tempo de reação.", "O Serverless escala de zero automaticamente, enquanto o Kubernetes reage a regras.", "Ambos os modelos escalam da mesma forma, adicionando instâncias de VM.", "O autoescalonamento do Kubernetes é mais eficiente para cargas esporádicas."], answer: "O Serverless escala de zero automaticamente, enquanto o Kubernetes reage a regras." },
-            { question: "Por que a imutabilidade dos contêineres é crucial para a confiabilidade em CI/CD?", options: ["Porque permite que desenvolvedores apliquem patches em contêineres em produção.", "Porque garante que cada implantação seja consistente, simplificando rollbacks.", "Porque contêineres imutáveis consomem menos recursos de CPU e memória.", "Porque impede que os contêineres sejam excluídos acidentalmente do registro."], answer: "Porque garante que cada implantação seja consistente, simplificando rollbacks." },
-            { question: "Qual a implicação da arquitetura do control plane do EKS ser em uma VPC separada e gerenciada pela AWS?", options: ["Reduz a segurança, pois a comunicação entre o control plane e os nós é pública.", "Aumenta a sobrecarga operacional, pois o cliente precisa gerenciar duas VPCs.", "Melhora a segurança e a resiliência, isolando o cérebro do cluster.", "Impede o uso de ferramentas de IaC para provisionar os nós de trabalho."], answer: "Melhora a segurança e a resiliência, isolando o cérebro do cluster." },
-            { question: "O que o princípio de 'least privilege' (menor privilégio) significa no contexto do AWS IAM?", options: ["Atribuir permissões de administrador a todos os usuários para agilizar o desenvolvimento.", "Conceder apenas as permissões mínimas necessárias para uma tarefa ser executada.", "Utilizar uma única política de permissões para todos os usuários e serviços da conta.", "Remover todas as permissões de acesso e concedê-las manualmente quando solicitado."], answer: "Conceder apenas as permissões mínimas necessárias para uma tarefa ser executada." },
-            { question: "Como o Amazon RDS simplifica o gerenciamento de um banco de dados relacional?", options: ["Permitindo que o usuário instale e configure o software do banco de dados em uma instância EC2.", "Automatizando tarefas como provisionamento, aplicação de patches, e backups.", "Oferecendo uma interface de linha de comando para executar consultas SQL complexas.", "Fornecendo um serviço de banco de dados NoSQL otimizado para escalabilidade horizontal."], answer: "Automatizando tarefas como provisionamento, aplicação de patches, e backups." },
-            { question: "Qual dos seguintes é um desafio de monitoramento específico de arquiteturas de microsserviços?", options: ["A facilidade de ter todos os logs da aplicação consolidados em um único arquivo.", "A dificuldade de rastrear uma única requisição que passa por múltiplos serviços.", "A previsibilidade do desempenho, já que todos os serviços escalam juntos.", "A baixa quantidade de métricas geradas, dificultando a análise de tendências."], answer: "A dificuldade de rastrear uma única requisição que passa por múltiplos serviços." },
-            { question: "Por que um 'Service' do Kubernetes é essencial para aplicações com estado?", options: ["Porque ele garante que os dados da aplicação sejam apagados após cada reinicialização do pod.", "Porque ele fornece um ponto de acesso de rede estável, mesmo que os pods sejam recriados.", "Porque ele impede que mais de uma réplica da aplicação seja executada ao mesmo tempo.", "Porque ele gerencia o provisionamento de armazenamento persistente para os pods."], answer: "Porque ele fornece um ponto de acesso de rede estável, mesmo que os pods sejam recriados." },
-            { question: "Qual a relação entre o Cloud Native Computing Foundation (CNCF) e o Kubernetes?", options: ["A CNCF é uma empresa concorrente que desenvolveu uma alternativa ao Kubernetes.", "O Kubernetes foi criado pela CNCF e doado ao Google para manutenção.", "A CNCF é uma fundação que hospeda e mantém o projeto Kubernetes.", "O Kubernetes é um padrão fechado, sem relação com a CNCF ou o código aberto."], answer: "A CNCF é uma fundação que hospeda e mantém o projeto Kubernetes." },
-            { question: "O que diferencia a abordagem de 'self-managed nodes' da de 'managed node groups' no EKS?", options: ["Nos 'self-managed', a AWS gerencia o ciclo de vida das instâncias, e nos 'managed', o usuário.", "Nos 'managed', a AWS automatiza o provisionamento e ciclo de vida das instâncias EC2.", "Os 'self-managed nodes' são uma opção serverless, enquanto os 'managed' não são.", "Não há diferença funcional, apenas uma diferença no modelo de cobrança."], answer: "Nos 'managed', a AWS automatiza o provisionamento e ciclo de vida das instâncias EC2." },
-            { question: "Qual dos seguintes é um exemplo de um gatilho (trigger) para uma função AWS Lambda?", options: ["Uma conexão SSH direta a uma instância EC2.", "Um upload de arquivo em um bucket S3.", "A criação manual de um volume EBS.", "Uma consulta SQL executada em um banco de dados RDS."], answer: "Um upload de arquivo em um bucket S3." },
-            { question: "O que o Azure Application Insights fornece para o Azure Functions?", options: ["Um registro de imagens de contêiner para armazenar as funções.", "Autenticação e autorização para proteger os endpoints HTTP.", "Monitoramento e análise de desempenho das execuções das funções.", "Um gateway de API para gerenciar e expor as funções para a internet."], answer: "Monitoramento e análise de desempenho das execuções das funções." },
-            { question: "Por que a consistência é um benefício chave da IaC?", options: ["Porque permite que cada ambiente seja configurado de forma diferente e otimizada.", "Porque elimina o 'configuration drift' ao definir a infraestrutura em código.", "Porque requer que todas as alterações de infraestrutura sejam feitas manualmente.", "Porque torna o processo de provisionamento mais lento e, portanto, mais seguro."], answer: "Porque elimina o 'configuration drift' ao definir a infraestrutura em código." },
-            { question: "No ciclo de CI/CD, onde a construção de uma imagem de contêiner normalmente ocorre?", options: ["Na fase de Integração Contínua (CI), após a compilação e testes.", "Na fase de Implantação Contínua (CD), diretamente no ambiente de produção.", "Manualmente pelo desenvolvedor antes de enviar o código para o repositório.", "A imagem não é construída, o código-fonte é copiado para os contêineres."], answer: "Na fase de Integração Contínua (CI), após a compilação e testes." },
-            { question: "Qual a principal vantagem de usar o Google Firebase como BaaS?", options: ["Oferece controle total sobre a infraestrutura subjacente, incluindo os servidores.", "Fornece funcionalidades de backend prontas, acelerando o desenvolvimento.", "É otimizado para executar código de computação intensiva em resposta a eventos.", "Requer que o desenvolvedor construa e gerencie seu próprio sistema de autenticação."], answer: "Fornece funcionalidades de backend prontas, acelerando o desenvolvimento." },
-            { question: "O que diferencia o modelo de preços do AWS Lambda do modelo do EC2?", options: ["O Lambda cobra por hora, mesmo que ocioso, enquanto o EC2 cobra por execução.", "O EC2 cobra por segundo/hora, enquanto o Lambda cobra por invocação e tempo de execução.", "Ambos têm exatamente o mesmo modelo de cobrança baseado em instâncias.", "O Lambda tem um custo fixo mensal, e o EC2 tem um custo variável."], answer: "O EC2 cobra por segundo/hora, enquanto o Lambda cobra por invocação e tempo de execução." },
-            { question: "Qual a função do 'Horizontal Pod Autoscaler' (HPA) no Kubernetes?", options: ["Ajustar o número de nós no cluster com base na demanda geral.", "Aumentar ou diminuir o número de réplicas de um pod com base em métricas.", "Ajustar a quantidade de CPU e memória alocada para um único pod.", "Reiniciar pods que falharam em um nó diferente e saudável do cluster."], answer: "Aumentar ou diminuir o número de réplicas de um pod com base em métricas." },
-            { question: "O que é 'orquestração' no contexto de contêineres?", options: ["O processo de escrever o Dockerfile para construir uma imagem de contêiner.", "A automação do gerenciamento, escalabilidade e ciclo de vida de contêineres.", "A instalação do Docker ou outro container runtime em um servidor.", "A conversão de uma aplicação monolítica em uma arquitetura de microsserviços."], answer: "A automação do gerenciamento, escalabilidade e ciclo de vida de contêineres." }
-        ]
-    };
-
-    // Estado do jogo (únicas variáveis, organizadas)
-    let currentLevel = null;
-    let currentList = [];
-    let currentIndex = 0;
-    let selectedIndex = null;
-    let score = 0;
-    const HISTORY_KEY = 'quiz_history_v1';
-
-    // Utilidades
-    function shuffleArray(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random()*(i+1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    }
-    function saveHistoryEntry(level, scoreValue, total) {
-        const raw = localStorage.getItem(HISTORY_KEY);
-        const data = raw ? JSON.parse(raw) : { medium: [], hard: [], university: [] };
-        data[level] = data[level] || [];
-        data[level].unshift({ score: scoreValue, total, when: new Date().toISOString().slice(0,19).replace('T',' ') });
-        if (data[level].length > 50) data[level].length = 50;
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(data));
-    }
-    function loadHistory() {
-        try {
-            const raw = localStorage.getItem(HISTORY_KEY);
-            return raw ? JSON.parse(raw) : { medium: [], hard: [], university: [] };
-        } catch(e){ return { medium: [], hard: [], university: [] }; }
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        iconMoon.classList.remove('hidden');
+        iconSun.classList.add('hidden');
+        localStorage.setItem('color-theme','dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        iconMoon.classList.add('hidden');
+        iconSun.classList.remove('hidden');
+        localStorage.setItem('color-theme','light');
+      }
+      themeToggle.setAttribute('aria-pressed', String(isDark));
     }
 
-    // UI flows
-    function showStartScreen() {
-        startScreen.classList.remove('hidden');
-        gameScreen.classList.add('hidden');
-        endScreen.classList.add('hidden');
-        historyScreen.classList.add('hidden');
+    /***********************************************
+     * Game Flow & Logic
+     ***********************************************/
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
     }
+
+    function initPools() {
+      Object.keys(questions).forEach(level => {
+        pools[level] = [...questions[level]];
+        shuffle(pools[level]);
+      });
+    }
+
+    function showScreen(screenToShow) {
+        [startScreen, gameScreen, endScreen, historyScreen].forEach(screen => {
+            screen.classList.toggle('hidden', screen !== screenToShow);
+            screen.setAttribute('aria-hidden', String(screen !== screenToShow));
+        });
+    }
+
+    function showStartScreen() { showScreen(startScreen); }
+
     function showHistoryScreen() {
-        startScreen.classList.add('hidden');
-        gameScreen.classList.add('hidden');
-        endScreen.classList.add('hidden');
-        historyScreen.classList.remove('hidden');
+        showScreen(historyScreen);
         showHistoryTab('medium');
     }
-    function showGameScreen() {
-        startScreen.classList.add('hidden');
-        gameScreen.classList.remove('hidden');
-        endScreen.classList.add('hidden');
-        historyScreen.classList.add('hidden');
-    }
 
-    // Render histórico por aba
-    function showHistoryTab(level) {
-        tabMedium.classList.remove('active'); tabHard.classList.remove('active'); tabUniversity.classList.remove('active');
-        if (level === 'medium') tabMedium.classList.add('active');
-        if (level === 'hard') tabHard.classList.add('active');
-        if (level === 'university') tabUniversity.classList.add('active');
-
-        const data = loadHistory();
-        const list = data[level] || [];
-        historyLogContainer.innerHTML = '';
-        if (!list.length) {
-            historyLogContainer.innerHTML = `<div class="text-slate-500 p-4">Nenhum registro para ${level} ainda. Jogue e seu progresso será salvo automaticamente.</div>`;
-            return;
-        }
-        list.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'p-2 rounded border border-slate-100 dark:border-slate-800 mb-2 bg-white dark:bg-slate-800';
-            el.innerHTML = `<div class="flex justify-between"><div><strong>${item.score}/${item.total}</strong> — ${level}</div><div class="text-sm text-slate-500">${item.when}</div></div>`;
-            historyLogContainer.appendChild(el);
-        });
-    }
-
-    // Start game
     function startGame(level) {
-        currentLevel = level;
-        currentList = Array.isArray(questions[level]) ? [...questions[level]] : [];
-        if (!currentList.length) {
-            alert('Nenhuma pergunta disponível para este nível.');
-            return;
-        }
-        shuffleArray(currentList);
-        currentIndex = 0;
-        selectedIndex = null;
-        score = 0;
-        quizTitle.textContent = (level === 'medium' ? 'Nível: Médio' : level === 'hard' ? 'Nível: Difícil' : 'Nível: Univ.');
-        totalQuestionsEl.textContent = currentList.length;
-        showGameScreen();
-        renderQuestion();
+      if (Tone.context.state !== 'running') {
+        Tone.start().then(setupAudio);
+      } else {
+        setupAudio();
+      }
+
+      currentDifficulty = level;
+      if (!pools[level] || pools[level].length < 1) initPools();
+
+      currentScore = 0;
+      currentIndex = 0;
+
+      const poolLen = pools[level].length;
+      const total = Math.min(DEFAULT_TOTAL, poolLen);
+      currentQuestions = pools[level].slice(0, total);
+
+      quizTitleEl.textContent = classMap[level].name;
+      quizTitleEl.className = `text-xl font-bold ${classMap[level].titleClass}`;
+      
+      showScreen(gameScreen);
+      renderQuestion();
     }
 
-    // Render question
     function renderQuestion() {
-        const q = currentList[currentIndex];
-        questionText.textContent = q.question;
-        optionsArea.innerHTML = '';
-        q.options.forEach((opt, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'quiz-option w-full text-left p-3 bg-white border border-slate-200 rounded-lg shadow-sm';
-            btn.type = 'button';
-            btn.setAttribute('data-index', i);
-            btn.setAttribute('role','radio');
-            btn.setAttribute('aria-checked','false');
-            btn.innerHTML = `<div class="flex items-center justify-between"><div class="font-medium">${String.fromCharCode(65+i)}. ${opt}</div><div class="text-slate-400 text-sm">Pressione ${i+1}</div></div>`;
-            btn.addEventListener('click', ()=> { selectOption(i); });
-            btn.addEventListener('keydown', (e)=> {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectOption(i); confirmButton.focus(); }
-            });
-            optionsArea.appendChild(btn);
-        });
-        confirmButton.disabled = true;
-        confirmButton.classList.remove('opacity-50');
-        nextButton.classList.add('hidden');
-        currentQuestionEl.textContent = currentIndex + 1;
+      updateProgress();
+      selectedOption = null;
+      confirmButton.disabled = true;
+      confirmButton.classList.remove('hidden');
+      nextButton.classList.add('hidden');
+
+      const q = currentQuestions[currentIndex];
+      questionTextEl.textContent = q.question;
+
+      const opts = [...q.options];
+      shuffle(opts);
+
+      optionsAreaEl.innerHTML = '';
+      opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option focus-ring w-full dark:bg-slate-800 dark:border-slate-700';
+        btn.setAttribute('type','button');
+        btn.dataset.option = opt;
+        btn.innerHTML = `<strong>${String.fromCharCode(65+idx)}.</strong> <span class="ml-2">${opt}</span>`;
+        btn.addEventListener('click', () => selectOption(btn, opt));
+        optionsAreaEl.appendChild(btn);
+      });
+
+      setTimeout(()=> { optionsAreaEl.querySelector('button')?.focus(); }, 120);
     }
 
-    function selectOption(i) {
-        const buttons = Array.from(optionsArea.children);
-        buttons.forEach((b, idx) => {
-            b.classList.toggle('selected', idx === i);
-            b.setAttribute('aria-checked', String(idx === i));
-        });
-        selectedIndex = i;
-        confirmButton.disabled = false;
+    function selectOption(button, option) {
+      optionsAreaEl.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+      button.classList.add('selected');
+      selectedOption = option;
+      confirmButton.disabled = false;
+      playClick();
     }
 
     function confirmAnswer() {
-        if (selectedIndex === null) return;
-        const q = currentList[currentIndex];
-        const chosen = q.options[selectedIndex];
-        const buttons = Array.from(optionsArea.children);
-        buttons.forEach((b, idx) => {
-            const text = q.options[idx];
-            // marcar correto
-            if (text === q.answer) b.classList.add('correct');
-            if (idx === selectedIndex && text !== q.answer) b.classList.add('incorrect','shake');
-            b.style.pointerEvents = 'none';
-        });
-        if (q.options[selectedIndex] === q.answer) {
-            score++;
-            launchConfetti(12);
-            playTone('success');
-        } else {
-            playTone('fail');
+      if (selectedOption === null) return;
+      const q = currentQuestions[currentIndex];
+      const isCorrect = selectedOption === q.answer;
+      
+      optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => {
+        btn.disabled = true;
+        if (btn.dataset.option === q.answer) {
+          btn.classList.add('correct');
+        } else if (btn.dataset.option === selectedOption) {
+          btn.classList.add('incorrect', 'shake');
         }
-        nextButton.classList.remove('hidden');
-        confirmButton.disabled = true;
+      });
+
+      if (isCorrect) {
+        currentScore++;
+        playCorrect();
+        launchConfetti(20);
+      } else {
+        playWrong();
+      }
+
+      confirmButton.classList.add('hidden');
+      nextButton.textContent = (currentIndex < currentQuestions.length - 1) ? "Próxima Pergunta" : "Ver Pontuação";
+      nextButton.classList.remove('hidden');
+      nextButton.focus();
     }
 
     function nextQuestion() {
-        currentIndex++;
-        if (currentIndex >= currentList.length) {
-            endGame();
-            return;
-        }
-        selectedIndex = null;
+      currentIndex++;
+      if (currentIndex >= currentQuestions.length) {
+        endGame();
+      } else {
         renderQuestion();
+      }
     }
 
     function endGame() {
-        saveHistoryEntry(currentLevel, score, currentList.length);
-        finalScore.textContent = `${score} / ${currentList.length}`;
-        gameScreen.classList.add('hidden');
-        endScreen.classList.remove('hidden');
+      saveScoreToHistory(currentDifficulty, currentScore, currentQuestions.length);
+      finalScoreEl.textContent = `${currentScore} / ${currentQuestions.length}`;
+      replayButton.onclick = () => startGame(currentDifficulty);
+      showScreen(endScreen);
+      if (currentScore / currentQuestions.length >= 0.6) launchConfetti(40);
     }
 
     function exitGame() {
-        if (confirm('Deseja realmente sair da rodada atual?')) {
-            showStartScreen();
-        }
+        showModal( 'Sair da Rodada?', 'Seu progresso será perdido. Tem certeza?',
+            [
+                { text: 'Cancelar', class: 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600', action: hideModal },
+                { text: 'Sair', class: 'bg-red-600 text-white', action: () => { hideModal(); showStartScreen(); } }
+            ]
+        );
+    }
+    
+    /***********************************************
+     * UI Helpers (Progress, Confetti, etc.)
+     ***********************************************/
+    function updateProgress() {
+      if (!currentQuestions || currentQuestions.length === 0) {
+        progressBar.style.width = '0%';
+        return;
+      }
+      const pct = Math.round((currentIndex / currentQuestions.length) * 100);
+      progressBar.style.width = `${pct}%`;
     }
 
-    // confetti simples
-    function launchConfetti(amount = 12) {
-        const colors = ['#ef4444','#f59e0b','#10b981','#60a5fa','#a78bfa','#f472b6'];
-        for (let i=0;i<amount;i++){
-            const el = document.createElement('div');
-            el.className = 'confetti';
-            el.style.left = (Math.random()*100) + '%';
-            el.style.background = colors[Math.floor(Math.random()*colors.length)];
-            el.style.width = (8 + Math.random()*8) + 'px';
-            el.style.height = (8 + Math.random()*8) + 'px';
-            el.style.top = '-10vh';
-            el.style.animation = `fall ${2 + Math.random()*2}s linear forwards`;
-            animationOverlay.appendChild(el);
-            setTimeout(()=> el.remove(), 4500);
-        }
+    function launchConfetti(amount = 20) {
+      const colors = ['#ef4444','#f59e0b','#10b981','#60a5fa','#a78bfa','#f472b6'];
+      for (let i=0; i<amount; i++){
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.style.left = (Math.random()*100) + '%';
+        el.style.background = colors[Math.floor(Math.random()*colors.length)];
+        el.style.animation = `confettiFall ${2 + Math.random()*2}s linear forwards`;
+        animationOverlay.appendChild(el);
+        setTimeout(()=> el.remove(), 5000);
+      }
     }
 
-    // Simple tones with Tone.js (kept minimal)
-    let synth = null;
-    function initTone() {
-        try {
-            synth = new Tone.Synth({ oscillator: { type: 'sine' } }).toDestination();
-        } catch (e) { synth = null; }
-    }
-    initTone();
-    function playTone(kind) {
-        if (!synth) return;
-        try {
-            if (Tone.context.state !== 'running') Tone.start();
-        } catch(e){}
-        if (kind === 'success') {
-            try { synth.triggerAttackRelease('C5', '8n'); setTimeout(()=> synth.triggerAttackRelease('E5', '8n'), 80); } catch(e){}
-        } else if (kind === 'fail') {
-            try { synth.triggerAttackRelease('A3', '8n'); } catch(e){}
-        }
+    /***********************************************
+     * Histórico (localStorage)
+     ***********************************************/
+    const HISTORY_KEY = 'cloudQuizHistory_v2';
+    function saveScoreToHistory(level, score, total) {
+      const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      history.unshift({ level, score, total, date: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short'}) });
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50))); // Limit history size
     }
 
-    // event listeners wiring (use delegation for start buttons)
-    document.querySelectorAll('.level-button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const lv = btn.getAttribute('data-level');
-            startGame(lv);
+    function showHistoryTab(level) {
+      ['medium','hard','university'].forEach(id => document.getElementById(`tab-${id}`).classList.remove('active'));
+      document.getElementById(`tab-${level}`).classList.add('active');
+
+      const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      const filtered = history.filter(h => h.level === level);
+      historyLogContainerEl.innerHTML = '';
+      if (filtered.length === 0) {
+        historyLogContainerEl.innerHTML = `<p class="text-slate-500 dark:text-slate-400 text-center p-4">Nenhuma rodada jogada neste nível.</p>`;
+        return;
+      }
+      filtered.forEach(entry => {
+        const info = classMap[entry.level] || { name: entry.level };
+        const el = document.createElement('div');
+        el.className = 'flex justify-between items-center text-sm p-3 bg-white dark:bg-slate-800/50 rounded-md shadow-sm mb-2';
+        el.innerHTML = `<div><strong class="mr-2">${info.name}</strong><span class="text-slate-600 dark:text-slate-200">${entry.score}/${entry.total}</span></div><div class="text-xs text-slate-400">${entry.date}</div>`;
+        historyLogContainerEl.appendChild(el);
+      });
+    }
+    
+    function clearHistory() {
+        showModal( 'Limpar Histórico?', 'Esta ação apagará todos os seus resultados. Deseja continuar?',
+            [
+                { text: 'Cancelar', class: 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600', action: hideModal },
+                { text: 'Sim, Limpar', class: 'bg-red-600 text-white', action: () => {
+                    localStorage.removeItem(HISTORY_KEY);
+                    showHistoryTab(document.querySelector('.tab-button.active').id.replace('tab-',''));
+                    hideModal();
+                }}
+            ]
+        );
+    }
+    /***********************************************
+     * Modal System
+     ***********************************************/
+    function showModal(title, body, actions = []) {
+        modalTitleEl.textContent = title;
+        modalBodyEl.innerHTML = body;
+        modalActionsEl.innerHTML = '';
+        actions.forEach(action => {
+            const btn = document.createElement('button');
+            btn.textContent = action.text;
+            btn.className = `modal-button rounded-lg px-4 py-2 font-semibold ${action.class}`;
+            btn.onclick = action.action;
+            modalActionsEl.appendChild(btn);
         });
-    });
-    btnHistory.addEventListener('click', showHistoryScreen);
-    btnHistoryBack.addEventListener('click', showStartScreen);
-    tabMedium.addEventListener('click', ()=> showHistoryTab('medium'));
-    tabHard.addEventListener('click', ()=> showHistoryTab('hard'));
-    tabUniversity.addEventListener('click', ()=> showHistoryTab('university'));
-    btnClearHistory.addEventListener('click', ()=> {
-        if (!confirm('Tem certeza? Isso apagará todo o histórico.')) return;
-        localStorage.removeItem(HISTORY_KEY);
-        showHistoryTab('medium');
-    });
-
-    confirmButton.addEventListener('click', confirmAnswer);
-    nextButton.addEventListener('click', nextQuestion);
-    btnExit.addEventListener('click', exitGame);
-    document.getElementById('btn-play-again').addEventListener('click', ()=> startGame(currentLevel || 'medium'));
-
-    // Keyboard shortcuts
+        modalEl.classList.add('visible');
+    }
+    function hideModal() { modalEl.classList.remove('visible'); }
+    function showAbout() {
+        showModal( 'Sobre o Quiz', '<p>Quiz de Computação em Nuvem II desenvolvido por <strong>MG Produções</strong>.</p><p class="mt-2 text-sm">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">N</kbd> próxima · <kbd class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700">Esc</kbd> sair.</p>',
+            [{ text: 'Fechar', class: 'bg-sky-600 text-white', action: hideModal }]
+        );
+    }
+    /***********************************************
+     * Keyboard & Event Listeners
+     ***********************************************/
     window.addEventListener('keydown', (e) => {
-        if (!gameScreen.classList.contains('hidden')) {
-            if (/^[1-4]$/.test(e.key)) {
-                const idx = parseInt(e.key,10)-1;
-                const btn = optionsArea.children[idx];
-                if (btn) { btn.click(); btn.focus(); }
-            }
-            if (e.key === 'Enter') {
-                if (!confirmButton.disabled) confirmButton.click();
-                else if (!nextButton.classList.contains('hidden')) nextButton.click();
-            }
-            if (e.key.toLowerCase() === 'n') {
-                if (!nextButton.classList.contains('hidden')) nextButton.click();
-            }
-            if (e.key === 'Escape') exitGame();
-        } else {
-            if (startScreen.classList.contains('hidden')) return;
-            if (e.key === '1') startGame('medium');
-            if (e.key === '2') startGame('hard');
-            if (e.key === '3') startGame('university');
+      if (modalEl.classList.contains('visible')) {
+        if (e.key === 'Escape') hideModal();
+        return;
+      }
+      
+      if (!gameScreen.classList.contains('hidden')) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (!confirmButton.disabled) confirmButton.click();
+          else if (!nextButton.classList.contains('hidden')) nextButton.click();
+        } else if (e.key.toLowerCase() === 'n' && !nextButton.classList.contains('hidden')) {
+          nextButton.click();
+        } else if (e.key === 'Escape') {
+          exitGame();
         }
+      }
     });
 
-    // initialize UI
-    (function init() {
-        // ensure icons reflect theme
-        applyTheme(isDarkMode);
-        // set history tab default
-        showHistoryTab('medium');
-        showStartScreen();
-    })();
+    /***********************************************
+     * App Initialization
+     ***********************************************/
+    document.addEventListener('DOMContentLoaded', () => {
+        // Theme Listener
+        themeToggle.addEventListener('click', () => {
+            applyTheme(!document.documentElement.classList.contains('dark'));
+        });
 
-    </script>
+        // Sound Listener
+        soundToggle.addEventListener('click', async () => {
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+                setupAudio();
+            }
+            setSound(!soundEnabled);
+        });
+
+        // Modal Close Listener
+        modalEl.addEventListener('click', (e) => {
+            if (e.target === modalEl) hideModal();
+        });
+
+        // Initial Setup
+        const preferDark = localStorage.getItem('color-theme') === 'dark' || (!localStorage.getItem('color-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        applyTheme(preferDark);
+        setSound(soundEnabled);
+        initPools();
+        showStartScreen();
+        document.getElementById('tab-medium').classList.add('active');
+    });
+  </script>
 </body>
 </html>
