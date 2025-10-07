@@ -1,144 +1,199 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Quiz de Computação em Nuvem II — MG Produções</title>
-  <meta name="description" content="Desafie seus conhecimentos em Computação em Nuvem com este quiz interativo! Níveis médio, difícil e universitário." />
-  <meta name="theme-color" content="#0f172a" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
+<html lang="pt-BR" class=""> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Computação em Nuvem II</title>
 
-  <style>
-    body { 
-        font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; 
-        -webkit-font-smoothing:antialiased; 
-        -moz-osx-font-smoothing:grayscale; 
-    }
-    .focus-ring:focus-visible { box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.4); outline: none; }
-    .quiz-option, .level-button, .action-button, .tab-button, .modal-button { transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, background-color .15s, border-color .15s; cursor: pointer; }
-    .quiz-option.selected { transform: translateY(-3px); border-width: 2px; border-color: #0ea5e9; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-    .correct { background-color: #16a34a !important; color: white !important; border-color: #15803d !important; }
-    .incorrect { background-color: #dc2626 !important; color: white !important; border-color: #b91c1c !important; }
-    .animated-gradient { background-image: linear-gradient(90deg,#38bdf8,#818cf8,#f472b6,#38bdf8); background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent; animation: gradient-animation 4s linear infinite; }
-    @keyframes gradient-animation { to { background-position:200% center; } }
-    .shake { animation: shake 0.6s ease-in-out; }
-    @keyframes shake { 0%,100%{ transform: translateX(0); } 10%,30%,50%,70%{ transform: translateX(-6px);} 20%,40%,60%,80%{ transform: translateX(6px);} }
-    .progress > i { transition: width .45s ease; }
-    
-    /* ANIMAÇÕES RESTAURADAS */
-    .confetti { position: absolute; width: 8px; height: 12px; opacity: 0.95; border-radius: 2px; will-change: transform, opacity; }
-    @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); } 100% { transform: translateY(120vh) rotate(720deg); opacity: 0; } }
-    
-    /* ESTILOS DO MODAL CORRIGIDOS */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; }
-    .modal-content { transform: scale(0.95); transition: transform 0.3s ease; }
-    .modal-overlay.visible { opacity: 1; visibility: visible; }
-    .modal-overlay.visible .modal-content { transform: scale(1); }
-    .tab-button.active { background-color: #0ea5e9; color: white; border-color: #0ea5e9; }
-  </style>
+    <meta name="description" content="Desafie seus conhecimentos em Computação em Nuvem com este quiz interativo! Níveis médio, difícil e universitário.">
+    <meta name="theme-color" content="#0ea5e9"> <meta property="og:title" content="Quiz de Computação em Nuvem | Teste seus conhecimentos!">
+    <meta property="og:description" content="Desafie-se com perguntas sobre AWS, Kubernetes, Serverless e mais. Você está pronto?">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1618335829737-2228915674e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80">
+    <meta property="og:url" content="https://maikongino.github.io/quiz/">
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Quiz de Computação em Nuvem | Teste seus conhecimentos!">
+    <meta name="twitter:description" content="Desafie-se com perguntas sobre AWS, Kubernetes, Serverless e mais. Você está pronto?">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1618335829737-2228915674e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-option, .level-button, .history-button, .action-button, .tab-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .quiz-option:hover:not(:disabled), .level-button:hover, .history-button:hover, .action-button:hover:not(:disabled), .tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .quiz-option:active, .level-button:active, .history-button:active, .action-button:active:not(:disabled), .tab-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .quiz-option.selected {
+            border-color: #38bdf8; /* sky-400 */
+            background-color: #e0f2fe; /* sky-100 */
+            color: #0369a1; /* sky-700 */
+        }
+        .dark .quiz-option.selected {
+            background-color: #0c4a6e; /* sky-900 */
+            color: #e0f2fe; /* sky-100 */
+        }
+        .correct {
+            background-color: #22c55e !important; color: white !important; border-color: #16a34a !important;
+        }
+        .incorrect {
+            background-color: #ef4444 !important; color: white !important; border-color: #dc2626 !important;
+        }
+        .tab-button.active {
+            border-color: #0ea5e9; /* sky-500 */
+            background-color: #0ea5e9;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .animated-gradient {
+            background-image: linear-gradient(90deg, #38bdf8, #818cf8, #f472b6, #38bdf8);
+            background-size: 200% auto;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-animation 4s linear infinite;
+        }
+        @keyframes gradient-animation {
+            to { background-position: 200% center; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.5s ease-in-out; }
+        @keyframes fall {
+            0% { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: fall 3s linear forwards;
+        }
+    </style>
 </head>
-<body class="min-h-screen grid place-items-center p-4 bg-slate-900 text-slate-200">
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col min-h-screen">
 
-  <main class="w-full max-w-2xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-10 relative z-10">
-    <div id="animation-overlay" class="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl z-20"></div>
+    <div id="animation-overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none z-50"></div>
 
-    <header class="flex items-center justify-between mb-6">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 grid place-items-center text-white font-extrabold text-xl">☁️</div>
-        <div>
-          <h1 class="text-2xl md:text-3xl font-bold text-sky-400">Computação em Nuvem II</h1>
-          <p class="text-sm text-slate-400">Teste seus conhecimentos — prático, rápido e didático.</p>
+    <main class="w-full flex-grow flex items-center justify-center p-4">
+        <div id="quiz-container" class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 relative z-10">
+            
+            <button id="theme-toggle" class="absolute top-4 right-4 p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" title="Alterar tema">
+                <svg id="theme-toggle-dark-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                <svg id="theme-toggle-light-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            </button>
+
+            <div id="start-screen" class="text-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-sky-600 dark:text-sky-400 mb-4">Computação em Nuvem II ☁️</h1>
+                <p class="text-slate-600 dark:text-slate-400 mb-8 text-lg">Selecione o nível de dificuldade para começar ou veja seu histórico.</p>
+                <div class="grid grid-cols-1 gap-4 mb-6">
+                    <button onclick="startGame('medium')" class="level-button w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 dark:focus-visible:ring-offset-slate-900">Nível Médio</button>
+                    <button onclick="startGame('hard')" class="level-button w-full bg-amber-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-600 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 dark:focus-visible:ring-offset-slate-900">Nível Difícil</button>
+                    <button onclick="startGame('university')" class="level-button w-full bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 dark:focus-visible:ring-offset-slate-900">Hard (Universitário)</button>
+                </div>
+                <button onclick="showHistoryScreen()" class="history-button w-full bg-slate-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-700 text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-900">Ver Histórico de Estudos</button>
+            </div>
+
+            <div id="game-screen" class="hidden">
+                <div class="flex justify-between items-start border-b border-slate-200 dark:border-slate-700 pb-4 mb-6">
+                    <div>
+                        <h2 id="quiz-title" class="text-xl font-bold"></h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Selecione a resposta correta.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <p class="text-sm font-medium">Questão</p>
+                            <p class="text-lg font-bold"><span id="current-question"></span> / <span id="total-questions"></span></p>
+                        </div>
+                        <button onclick="exitGame()" class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" title="Voltar ao Início">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="question-area" class="mb-6"><p id="question-text" class="text-lg md:text-xl font-semibold leading-relaxed"></p></div>
+                <div id="options-area" class="grid grid-cols-1 gap-4"></div>
+                <div id="action-area" class="mt-6 text-center h-14 flex items-center justify-center">
+                    <button id="confirm-button" onclick="confirmAnswer()" class="action-button w-1/2 bg-sky-600 text-white font-bold py-3 px-6 rounded-lg shadow-md disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800" disabled>Confirmar</button>
+                    <button id="next-button" onclick="nextQuestion()" class="action-button w-1/2 bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500 dark:focus-visible:ring-offset-slate-800">Próxima</button>
+                </div>
+            </div>
+            
+            <div id="end-screen" class="hidden text-center">
+                 <h2 class="text-3xl font-bold mb-4">Fim da Rodada!</h2>
+                 <p class="text-slate-600 dark:text-slate-400 text-xl mb-2">Sua pontuação foi:</p>
+                 <p id="final-score" class="text-6xl font-extrabold text-sky-600 dark:text-sky-400 mb-8"></p>
+                 <button onclick="showStartScreen()" class="w-full bg-sky-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-sky-700 transition-colors text-xl shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800">Jogar Novamente</button>
+            </div>
+
+            <div id="history-screen" class="hidden">
+                 <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-300">Histórico de Estudos</h2>
+                    <button onclick="showStartScreen()" class="text-sm font-bold bg-slate-200 dark:bg-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-500 dark:focus-visible:ring-offset-slate-800">Voltar</button>
+                </div>
+                <div class="border-b border-slate-200 dark:border-slate-700 mb-4">
+                    <nav class="flex space-x-2" aria-label="Tabs">
+                        <button onclick="showHistoryTab('medium')" id="tab-medium" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Médio</button>
+                        <button onclick="showHistoryTab('hard')" id="tab-hard" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Difícil</button>
+                        <button onclick="showHistoryTab('university')" id="tab-university" class="tab-button rounded-t-lg font-semibold px-3 py-2 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">Hard (Univ.)</button>
+                    </nav>
+                </div>
+                <div id="history-log-container" class="max-h-80 overflow-y-auto bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg space-y-2"></div>
+                <button onclick="clearHistory()" class="mt-6 w-full text-sm text-center text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded">Limpar todo o histórico</button>
+            </div>
         </div>
-      </div>
-    </header>
+    </main>
 
-    <section id="start-screen" class="space-y-5">
-      <p class="text-slate-400 leading-relaxed">Selecione o nível de dificuldade para iniciar o quiz.</p>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <button class="level-button focus-ring bg-slate-700/50 border border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md hover:bg-slate-700 hover:-translate-y-1" onclick="startGame('medium')" aria-label="Iniciar nível médio">
-          <div class="flex items-center justify-between">
-            <div class="text-left"><div class="text-sm text-slate-400">Nível</div><div class="text-lg font-bold">Médio</div></div>
-            <div class="text-sky-400 text-2xl">⚙️</div>
-          </div>
-        </button>
-        <button class="level-button focus-ring bg-slate-700/50 border border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md hover:bg-slate-700 hover:-translate-y-1" onclick="startGame('hard')" aria-label="Iniciar nível difícil">
-          <div class="flex items-center justify-between">
-            <div class="text-left"><div class="text-sm text-slate-400">Nível</div><div class="text-lg font-bold">Difícil</div></div>
-            <div class="text-amber-400 text-2xl">🔥</div>
-          </div>
-        </button>
-        <button class="level-button focus-ring bg-slate-700/50 border border-slate-700 rounded-lg p-3 font-semibold shadow-sm hover:shadow-md hover:bg-slate-700 hover:-translate-y-1" onclick="startGame('university')" aria-label="Iniciar nível universitário">
-          <div class="flex items-center justify-between">
-            <div class="text-left"><div class="text-sm text-slate-400">Nível</div><div class="text-lg font-bold">Universitário</div></div>
-            <div class="text-red-400 text-2xl">🎓</div>
-          </div>
-        </button>
-      </div>
-      <div class="flex gap-3">
-        <button onclick="showHistoryScreen()" class="action-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold hover:bg-sky-500">Ver Histórico</button>
-        <button onclick="showAbout()" class="action-button focus-ring px-4 py-3 rounded-lg bg-slate-700/50 border border-slate-700 hover:bg-slate-700">Sobre</button>
-      </div>
-    </section>
-
-    <section id="game-screen" class="hidden space-y-4" aria-hidden="true">
-      <div class="flex items-center justify-between gap-4">
-        <div><h2 id="quiz-title" class="text-lg font-bold"></h2><p class="text-sm text-slate-400">Selecione a resposta correta.</p></div>
-        <div class="w-48"><div class="text-sm text-slate-400">Progresso</div><div id="progress-container" class="progress mt-1 bg-slate-700" aria-hidden="true"><i id="progress-bar" class="block h-full bg-gradient-to-r from-sky-500 to-indigo-500"></i></div></div>
-      </div>
-      <div class="p-4 rounded-lg border border-slate-700"><p id="question-text" class="text-lg md:text-xl font-semibold leading-relaxed"></p></div>
-      <div id="options-area" class="grid gap-3"></div>
-      <div class="flex items-center gap-3 mt-2">
-        <button id="confirm-button" onclick="confirmAnswer()" class="action-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3 font-bold disabled:opacity-50 disabled:cursor-not-allowed" disabled>Confirmar</button>
-        <button id="next-button" onclick="nextQuestion()" class="hidden action-button focus-ring flex-1 bg-emerald-600 text-white rounded-lg py-3 font-bold">Próxima</button>
-        <button onclick="exitGame()" class="action-button focus-ring p-3 rounded-lg border border-slate-700 hover:bg-slate-700">Sair</button>
-      </div>
-      <div class="text-sm text-slate-500 mt-1">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-700">N</kbd> próxima</div>
-    </section>
-
-    <section id="end-screen" class="hidden text-center space-y-4" aria-hidden="true">
-      <h2 class="text-3xl font-bold">Fim da Rodada 🎉</h2>
-      <p class="text-slate-400">Sua pontuação:</p>
-      <div id="final-score" class="text-5xl font-extrabold text-sky-400"></div>
-      <div class="flex gap-3">
-        <button onclick="showStartScreen()" class="action-button focus-ring flex-1 border border-slate-700 rounded-lg py-3 hover:bg-slate-700">Voltar ao início</button>
-        <button id="replay-button" class="action-button focus-ring flex-1 bg-sky-600 text-white rounded-lg py-3">Jogar novamente</button>
-      </div>
-    </section>
-
-    <section id="history-screen" class="hidden" aria-hidden="true">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Histórico de Estudos</h2>
-        <div class="flex gap-2">
-          <button onclick="clearHistory()" class="text-sm text-red-500 hover:underline focus-ring">Limpar tudo</button>
-          <button onclick="showStartScreen()" class="action-button focus-ring text-sm border border-slate-700 rounded-lg px-3 py-2 hover:bg-slate-700">Voltar</button>
-        </div>
-      </div>
-      <div class="grid md:grid-cols-3 gap-3 mb-4">
-        <button id="tab-medium" class="tab-button focus-ring rounded-lg border border-slate-700 px-3 py-2" onclick="showHistoryTab('medium')">Médio</button>
-        <button id="tab-hard" class="tab-button focus-ring rounded-lg border border-slate-700 px-3 py-2" onclick="showHistoryTab('hard')">Difícil</button>
-        <button id="tab-university" class="tab-button focus-ring rounded-lg border border-slate-700 px-3 py-2" onclick="showHistoryTab('university')">Univ.</button>
-      </div>
-      <div id="history-log-container" class="bg-slate-900/40 p-4 rounded-lg max-h-64 overflow-y-auto"></div>
-    </section>
-
-    <footer class="mt-8 pt-6 border-t border-slate-700 text-sm text-slate-400 text-center">
-      Desenvolvido por <a href="https://portfoliomaikongino.web.app/" target="_blank" rel="noopener noreferrer" class="animated-gradient font-bold">MG Produções</a> — 2025
+    <footer class="text-center p-4 text-slate-500 dark:text-slate-400 text-sm sticky bottom-0 w-full bg-slate-100 dark:bg-slate-900">
+        Desenvolvido por
+        <a href="https://portfoliomaikongino.web.app/" target="_blank" rel="noopener noreferrer" class="font-bold animated-gradient hover:opacity-80 transition-opacity">
+            MG Produções
+        </a>
+        - 2025
     </footer>
-  </main>
+    
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-  <div id="modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal-content scale-95 space-y-4 bg-slate-800 text-slate-200 rounded-xl">
-      <h3 id="modal-title" class="text-2xl font-bold"></h3>
-      <div id="modal-body" class="text-slate-400"></div>
-      <div id="modal-actions" class="flex gap-3 justify-end"></div>
-    </div>
-  </div>
-      <script>
-       const questions = {
+        function applyTheme(isDark) {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                themeToggleLightIcon.classList.remove('hidden');
+                themeToggleDarkIcon.classList.add('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeToggleLightIcon.classList.add('hidden');
+                themeToggleDarkIcon.classList.remove('hidden');
+            }
+        }
+
+        const isDarkMode = localStorage.getItem('color-theme') === 'dark' || 
+                           (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        applyTheme(isDarkMode);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isCurrentlyDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('color-theme', isCurrentlyDark ? 'light' : 'dark');
+            applyTheme(!isCurrentlyDark);
+        });
+
+        const questions = {
             medium: [
                 { question: "Qual é a abstração fundamental do Amazon EC2?", options: ["Um contêiner leve e portátil.", "Uma Máquina Virtual (VM) na infraestrutura da AWS.", "Uma função serverless que executa código sob demanda.", "Um banco de dados relacional totalmente gerenciado."], answer: "Uma Máquina Virtual (VM) na infraestrutura da AWS." },
                 { question: "O que é uma 'Task Definition' no Amazon ECS?", options: ["Um documento que especifica a imagem Docker e os recursos para um contêiner.", "Uma regra de firewall virtual que controla o tráfego de rede para as instâncias.", "Um modelo pré-configurado para instâncias EC2, incluindo SO e software.", "Um script que automatiza a implantação de aplicações em um ambiente PaaS."], answer: "Um documento que especifica a imagem Docker e os recursos para um contêiner." },
@@ -148,7 +203,7 @@
                 { question: "O que é 'Infraestrutura como Código' (IaC)?", options: ["A prática de escrever o código da aplicação em uma linguagem de baixo nível.", "O gerenciamento de infraestrutura através de código e arquivos de configuração.", "A configuração manual de servidores usando uma interface gráfica web.", "O monitoramento do desempenho da aplicação por meio de logs e métricas."], answer: "O gerenciamento de infraestrutura através de código e arquivos de configuração." },
                 { question: "Qual a função de um 'Security Group' no contexto do Amazon EC2?", options: ["Balancear a carga de tráfego entre múltiplas instâncias para alta disponibilidade.", "Fornecer armazenamento persistente de dados para as instâncias, como um disco rígido.", "Atuar como um firewall virtual, controlando o tráfego de entrada e saída.", "Armazenar imagens de contêiner para serem usadas pelo Amazon ECS."], answer: "Atuar como um firewall virtual, controlando o tráfego de entrada e saída." },
                 { question: "No Kubernetes, qual é a menor unidade de implantação?", options: ["Nó (Node)", "Serviço (Service)", "Pod", "Cluster"], answer: "Pod" },
-                { question: "O que significa dizer que uma arquitetura é 'Event-Driven' (Orientada a Eventos)?", options: ["Que o código é executado em intervalos de tempo fixos, definidos pelo desenvolvedor.", "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo.", "Que a aplicação só pode ser acessada através de uma API RESTful.", "Que a infraestrutura é provisionada manually antes da execução do código."], answer: "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo." },
+                { question: "O que significa dizer que uma arquitetura é 'Event-Driven' (Orientada a Eventos)?", options: ["Que o código é executado em intervalos de tempo fixos, definidos pelo desenvolvedor.", "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo.", "Que a aplicação só pode ser acessada através de uma API RESTful.", "Que a infraestrutura é provisionada manualmente antes da execução do código."], answer: "Que as funções são acionadas em resposta a eventos, como o upload de um arquivo." },
                 { question: "Qual o objetivo principal do AWS IAM (Identity and Access Management)?", options: ["Monitorar as métricas de desempenho dos recursos da AWS, como CPU e memória.", "Controlar o acesso aos recursos da AWS, definindo permissões para usuários e serviços.", "Orquestrar a implantação de contêineres em um cluster de instâncias EC2.", "Fornecer uma rede virtual isolada para lançar recursos da AWS com segurança."], answer: "Controlar o acesso aos recursos da AWS, definindo permissões para usuários e serviços." },
                 { question: "O que é uma AMI (Amazon Machine Image)?", options: ["Um serviço de banco de dados NoSQL totalmente gerenciado pela AWS.", "Um modelo pré-configurado para instâncias EC2, contendo SO e software.", "Uma interface de linha de comando para interagir com os serviços da AWS.", "Um contêiner Docker otimizado para rodar em ambientes da Amazon."], answer: "Um modelo pré-configurado para instâncias EC2, contendo SO e software." },
                 { question: "Qual é o principal propósito do Amazon S3 (Simple Storage Service)?", options: ["Executar código de aplicação em resposta a eventos de forma serverless.", "Fornecer poder computacional escalável na forma de máquinas virtuais.", "Armazenar e recuperar qualquer quantidade de dados, a qualquer momento, de qualquer lugar.", "Oferecer um serviço de banco de dados relacional gerenciado com alta disponibilidade."], answer: "Armazenar e recuperar qualquer quantidade de dados, a qualquer momento, de qualquer lugar." },
@@ -292,281 +347,229 @@
                 { question: "O que é um 'release channel' no GKE?", options: ["Um canal de comunicação para suporte técnico com a equipe do Google.", "Uma funcionalidade que permite atualizações automáticas controladas do cluster.", "Um tipo de rede virtual para conectar clusters GKE em diferentes regiões.", "Uma política de segurança que restringe o acesso ao control plane do cluster."], answer: "Uma funcionalidade que permite atualizações automáticas controladas do cluster." }
             ]
         };
-    
-    let pools = {};
-    let currentDifficulty = null;
-    let currentQuestions = [];
-    let currentIndex = 0;
-    let selectedOption = null;
-    let currentScore = 0;
-    const DEFAULT_TOTAL = 5;
-    const classMap = {
-      medium: { name: 'Nível Médio 📚', color: 'text-blue-400' },
-      hard: { name: 'Nível Difícil ✒️', color: 'text-amber-400' },
-      university: { name: 'Nível Universitário 🎓', color: 'text-red-400' }
-    };
 
-    // DOM Elements
-    const startScreen = document.getElementById('start-screen');
-    const gameScreen = document.getElementById('game-screen');
-    const endScreen = document.getElementById('end-screen');
-    const historyScreen = document.getElementById('history-screen');
-    const quizTitleEl = document.getElementById('quiz-title');
-    const progressBar = document.getElementById('progress-bar');
-    const questionTextEl = document.getElementById('question-text');
-    const optionsAreaEl = document.getElementById('options-area');
-    const confirmButton = document.getElementById('confirm-button');
-    const nextButton = document.getElementById('next-button');
-    const finalScoreEl = document.getElementById('final-score');
-    const historyLogContainerEl = document.getElementById('history-log-container');
-    const replayButton = document.getElementById('replay-button');
-    const modalEl = document.getElementById('modal');
-    const modalTitleEl = document.getElementById('modal-title');
-    const modalBodyEl = document.getElementById('modal-body');
-    const modalActionsEl = document.getElementById('modal-actions');
-    const animationOverlay = document.getElementById('animation-overlay');
+        let questionPools = {};
+        let currentDifficulty = '';
+        let currentQuestions = [];
+        let score = 0;
+        let questionIndex = 0;
+        let selectedOption = null;
+        const totalGameQuestions = 15;
+        const allScreens = ['start-screen', 'game-screen', 'end-screen', 'history-screen'];
+        const quizContainer = document.getElementById('quiz-container');
+        const animationOverlay = document.getElementById('animation-overlay');
+        const quizTitleEl = document.getElementById('quiz-title');
+        const currentQuestionEl = document.getElementById('current-question');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsAreaEl = document.getElementById('options-area');
+        const confirmButton = document.getElementById('confirm-button');
+        const nextButton = document.getElementById('next-button');
+        const finalScoreEl = document.getElementById('final-score');
+        const historyLogContainerEl = document.getElementById('history-log-container');
+        const difficultyMap = {
+            medium: { name: 'Nível Médio', color: 'text-blue-500', titleClass: 'text-blue-600 dark:text-blue-400' },
+            hard: { name: 'Nível Difícil', color: 'text-amber-500', titleClass: 'text-amber-500 dark:text-amber-400' },
+            university: { name: 'Hard (Univ.)', color: 'text-red-500', titleClass: 'text-red-600 dark:text-red-400' }
+        };
+        let correctSynth, incorrectSynth;
 
-    // Áudio
-    let synthClick, synthCorrect, synthIncorrect;
-    function setupAudio() {
-      if (synthClick) return;
-      try {
-        synthClick = new Tone.Synth({ envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.1 } }).toDestination();
-        synthCorrect = new Tone.PolySynth(Tone.Synth).toDestination();
-        synthIncorrect = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, release: 0.2 } }).toDestination();
-      } catch(e) { console.error("Tone.js não inicializado:", e); }
-    }
-    function playClick() { if (!synthClick) return; try { synthClick.triggerAttackRelease('E5', '16n', Tone.now()); } catch(e){} }
-    function playCorrect() { if (!synthCorrect) return; try { synthCorrect.triggerAttackRelease(["C5","E5","G5"], "16n"); } catch(e){} }
-    function playWrong() { if (!synthIncorrect) return; try { synthIncorrect.triggerAttackRelease("C3", "8n"); } catch(e){} }
-
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-    }
-
-    function initPools() {
-      Object.keys(questions).forEach(level => {
-        pools[level] = [...questions[level]];
-        shuffle(pools[level]);
-      });
-    }
-
-    function showScreen(screenToShow) {
-      [startScreen, gameScreen, endScreen, historyScreen].forEach(screen => {
-        const isHidden = screen !== screenToShow;
-        screen.classList.toggle('hidden', isHidden);
-        screen.setAttribute('aria-hidden', String(isHidden));
-      });
-    }
-
-    function startGame(level) {
-      if (Tone.context.state !== 'running') { Tone.start().then(setupAudio); }
-      currentDifficulty = level;
-      if (!pools[level] || pools[level].length < 1) initPools();
-      currentScore = 0;
-      currentIndex = 0;
-      const total = Math.min(DEFAULT_TOTAL, pools[level].length);
-      currentQuestions = pools[level].slice(0, total);
-      quizTitleEl.textContent = classMap[level].name;
-      quizTitleEl.className = `text-lg font-bold ${classMap[level].color}`;
-      showScreen(gameScreen);
-      renderQuestion();
-    }
-
-    function renderQuestion() {
-      updateProgress();
-      selectedOption = null;
-      confirmButton.disabled = true;
-      confirmButton.classList.remove('hidden');
-      nextButton.classList.add('hidden');
-      const q = currentQuestions[currentIndex];
-      questionTextEl.textContent = q.question;
-      const opts = [...q.options];
-      shuffle(opts);
-      optionsAreaEl.innerHTML = '';
-      opts.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-option focus-ring w-full border border-slate-700 bg-slate-800 rounded-lg p-3 text-left hover:bg-slate-700';
-        btn.setAttribute('type', 'button');
-        btn.dataset.option = opt;
-        btn.innerHTML = `<span class="font-bold w-6 text-slate-400">${String.fromCharCode(65 + idx)}.</span> <span class="ml-2">${opt}</span>`;
-        btn.addEventListener('click', () => selectOption(btn, opt));
-        optionsAreaEl.appendChild(btn);
-      });
-      setTimeout(() => { optionsAreaEl.querySelector('button')?.focus(); }, 120);
-    }
-
-    function selectOption(button, option) {
-      playClick();
-      optionsAreaEl.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
-      button.classList.add('selected');
-      selectedOption = option;
-      confirmButton.disabled = false;
-    }
-
-    function confirmAnswer() {
-      if (selectedOption === null) return;
-      const q = currentQuestions[currentIndex];
-      const isCorrect = selectedOption === q.answer;
-      
-      optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => {
-        btn.disabled = true;
-        if (btn.dataset.option === q.answer) {
-          btn.classList.add('correct');
-        } else if (btn.dataset.option === selectedOption) {
-          btn.classList.add('incorrect', 'shake');
+        function setupAudio() {
+            correctSynth = new Tone.PolySynth(Tone.Synth).toDestination();
+            incorrectSynth = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, release: 0.2 } }).toDestination();
         }
-      });
+        function playCorrectSound() { if(correctSynth) correctSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n", Tone.now()); }
+        function playIncorrectSound() { if(incorrectSynth) incorrectSynth.triggerAttackRelease("C3", "8n", Tone.now()); }
 
-      if (isCorrect) {
-        currentScore++;
-        playCorrect();
-        launchConfetti();
-      } else {
-        playWrong();
-        triggerFailureAnimation();
-      }
-
-      confirmButton.classList.add('hidden');
-      nextButton.textContent = (currentIndex < currentQuestions.length - 1) ? "Próxima Pergunta" : "Ver Pontuação";
-      nextButton.classList.remove('hidden');
-      nextButton.focus();
-    }
-
-    function nextQuestion() {
-      currentIndex++;
-      (currentIndex >= currentQuestions.length) ? endGame() : renderQuestion();
-    }
-
-    function endGame() {
-      saveScoreToHistory(currentDifficulty, currentScore, currentQuestions.length);
-      finalScoreEl.textContent = `${currentScore} / ${currentQuestions.length}`;
-      replayButton.onclick = () => startGame(currentDifficulty);
-      showScreen(endScreen);
-      if (currentScore / currentQuestions.length >= 0.7) launchConfetti(50);
-    }
-    
-    function exitGame() {
-      showModal('Sair da Rodada?', 'Seu progresso será perdido. Tem certeza?', [
-        { text: 'Cancelar', class: 'border border-slate-600 hover:bg-slate-700', action: hideModal },
-        { text: 'Sair', class: 'bg-red-600 text-white hover:bg-red-500', action: () => { hideModal(); showScreen(startScreen); } }
-      ]);
-    }
-
-    function updateProgress() {
-      const pct = Math.round(((currentIndex) / currentQuestions.length) * 100);
-      progressBar.style.width = `${pct}%`;
-    }
-    
-    function launchConfetti(amount = 20) {
-      const colors = ['#ef4444','#f59e0b','#10b981','#60a5fa','#a78bfa','#f472b6'];
-      for (let i = 0; i < amount; i++){
-        const el = document.createElement('div');
-        el.className = 'confetti';
-        el.style.left = (Math.random() * 100) + '%';
-        el.style.background = colors[Math.floor(Math.random() * colors.length)];
-        el.style.animation = `confettiFall ${2 + Math.random() * 2}s linear ${Math.random() * 0.5}s forwards`;
-        animationOverlay.appendChild(el);
-        setTimeout(() => el.remove(), 5000);
-      }
-    }
-    
-    function triggerFailureAnimation() {
-        animationOverlay.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-6xl opacity-50 animate-ping">😟</div>';
-        setTimeout(() => { animationOverlay.innerHTML = ''; }, 800);
-    }
-
-    const HISTORY_KEY = 'cloudQuizHistory_v4';
-    function saveScoreToHistory(level, score, total) {
-      const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-      history.unshift({ level, score, total, date: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) });
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50)));
-    }
-    
-    function showHistoryScreen() {
-      showScreen(historyScreen);
-      showHistoryTab('medium');
-    }
-
-    function showHistoryTab(level) {
-      ['medium', 'hard', 'university'].forEach(id => document.getElementById(`tab-${id}`).classList.remove('active'));
-      document.getElementById(`tab-${level}`).classList.add('active');
-      const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-      const filtered = history.filter(h => h.level === level);
-      historyLogContainerEl.innerHTML = '';
-      if (filtered.length === 0) {
-        historyLogContainerEl.innerHTML = `<p class="text-slate-500 text-center p-4">Nenhuma rodada jogada neste nível.</p>`;
-        return;
-      }
-      filtered.forEach(entry => {
-        const info = classMap[entry.level] || { name: entry.level, color: 'text-slate-400' };
-        const el = document.createElement('div');
-        el.className = 'flex justify-between items-center text-sm p-3 bg-slate-700/50 rounded-md shadow-sm mb-2';
-        el.innerHTML = `<div><strong class="mr-2 ${info.color}">${info.name}</strong><span class="text-slate-300">${entry.score}/${entry.total}</span></div><div class="text-xs text-slate-500">${entry.date}</div>`;
-        historyLogContainerEl.appendChild(el);
-      });
-    }
-
-    function clearHistory() {
-      showModal('Limpar Histórico?', 'Esta ação apagará todos os seus resultados. Deseja continuar?', [
-        { text: 'Cancelar', class: 'border border-slate-600 hover:bg-slate-700', action: hideModal },
-        { text: 'Sim, Limpar', class: 'bg-red-600 text-white hover:bg-red-500', action: () => {
-          localStorage.removeItem(HISTORY_KEY);
-          const activeTab = document.querySelector('.tab-button.active')?.id.replace('tab-', '') || 'medium';
-          showHistoryTab(activeTab);
-          hideModal();
-        }}
-      ]);
-    }
-
-    function showModal(title, body, actions = []) {
-      modalTitleEl.textContent = title;
-      modalBodyEl.innerHTML = body;
-      modalActionsEl.innerHTML = '';
-      actions.forEach(action => {
-        const btn = document.createElement('button');
-        btn.textContent = action.text;
-        btn.className = `modal-button focus-ring rounded-lg px-4 py-2 font-semibold ${action.class}`;
-        btn.onclick = action.action;
-        modalActionsEl.appendChild(btn);
-      });
-      modalEl.classList.add('visible');
-    }
-    
-    function hideModal() { modalEl.classList.remove('visible'); }
-    
-    function showAbout() {
-      showModal('Sobre o Quiz', '<p>Quiz de Computação em Nuvem II desenvolvido por <strong>MG Produções</strong>.</p><p class="mt-2 text-sm">Atalhos: <kbd class="px-2 py-1 rounded bg-slate-700">Enter</kbd> confirmar · <kbd class="px-2 py-1 rounded bg-slate-700">N</kbd> próxima · <kbd class="px-2 py-1 rounded bg-slate-700">Esc</kbd> sair.</p>',
-        [{ text: 'Fechar', class: 'bg-sky-600 text-white hover:bg-sky-500', action: hideModal }]
-      );
-    }
-    
-    window.addEventListener('keydown', (e) => {
-      if (modalEl.classList.contains('visible')) {
-        if (e.key === 'Escape') hideModal();
-        return;
-      }
-      if (!gameScreen.classList.contains('hidden')) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          if (!confirmButton.disabled) confirmButton.click();
-          else if (!nextButton.classList.contains('hidden')) nextButton.click();
-        } else if (e.key.toLowerCase() === 'n' && !nextButton.classList.contains('hidden')) {
-          nextButton.click();
-        } else if (e.key === 'Escape') {
-          exitGame();
+        function triggerSuccessAnimation() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                animationOverlay.appendChild(confetti);
+            }
+            setTimeout(() => animationOverlay.innerHTML = '', 5000);
         }
-      }
-    });
+        function triggerFailureAnimation() {
+            quizContainer.classList.add('shake');
+            animationOverlay.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-8xl opacity-50 animate-ping">😟</div>';
+            setTimeout(() => {
+                quizContainer.classList.remove('shake');
+                animationOverlay.innerHTML = '';
+            }, 600);
+        }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      modalEl.addEventListener('click', (e) => { if (e.target === modalEl) hideModal(); });
-      initPools();
-      showScreen(startScreen);
-    });
-  </script>
+        function showScreen(screenId) {
+            allScreens.forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+        function showStartScreen() { showScreen('start-screen'); }
+        function showHistoryScreen() { 
+            showScreen('history-screen');
+            showHistoryTab('medium');
+        }
+
+        function exitGame() {
+            if (confirm('Tem certeza que deseja sair? Seu progresso na rodada atual será perdido.')) {
+                showStartScreen();
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        function initializePools() {
+            Object.keys(questions).forEach(level => {
+                questionPools[level] = [...questions[level]];
+                shuffleArray(questionPools[level]);
+            });
+        }
+
+        function startGame(difficulty) {
+            if (Tone.context.state !== 'running') {
+                Tone.start().then(setupAudio);
+            }
+            currentDifficulty = difficulty;
+            
+            if (!questionPools[difficulty] || questionPools[difficulty].length < totalGameQuestions) {
+                initializePools();
+            }
+            
+            score = 0;
+            questionIndex = 0;
+            currentQuestions = questionPools[difficulty].splice(0, totalGameQuestions);
+            
+            showScreen('game-screen');
+            const levelInfo = difficultyMap[difficulty];
+            quizTitleEl.textContent = levelInfo.name;
+            quizTitleEl.className = `text-xl font-bold ${levelInfo.titleClass}`;
+            totalQuestionsEl.textContent = totalGameQuestions;
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            selectedOption = null;
+            confirmButton.disabled = true;
+            confirmButton.classList.remove('hidden');
+            nextButton.classList.add('hidden');
+            const current = currentQuestions[questionIndex];
+            currentQuestionEl.textContent = questionIndex + 1;
+            questionTextEl.textContent = current.question;
+            optionsAreaEl.innerHTML = '';
+            
+            const shuffledOptions = [...current.options];
+            shuffleArray(shuffledOptions);
+
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'quiz-option w-full p-4 border-2 border-slate-300 dark:border-slate-600 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500 dark:focus-visible:ring-offset-slate-800';
+                button.onclick = () => selectOption(button, option);
+                optionsAreaEl.appendChild(button);
+            });
+        }
+
+        function selectOption(button, option) {
+            optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            selectedOption = option;
+            confirmButton.disabled = false;
+        }
+        
+        function confirmAnswer() {
+            if (selectedOption === null) return;
+            const isCorrect = selectedOption === currentQuestions[questionIndex].answer;
+            optionsAreaEl.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === currentQuestions[questionIndex].answer) btn.classList.add('correct');
+                if (btn.textContent === selectedOption && !isCorrect) btn.classList.add('incorrect');
+            });
+
+            if (isCorrect) {
+                score++;
+                playCorrectSound();
+                triggerSuccessAnimation();
+            } else {
+                playIncorrectSound();
+                triggerFailureAnimation();
+            }
+
+            confirmButton.classList.add('hidden');
+            nextButton.textContent = (questionIndex < totalGameQuestions - 1) ? "Próxima Pergunta" : "Ver Pontuação";
+            nextButton.classList.remove('hidden');
+        }
+        
+        function nextQuestion() {
+            questionIndex++;
+            if(questionIndex < totalGameQuestions){
+                 displayQuestion();
+            } else {
+                 showEndScreen();
+            }
+        }
+        
+        function showEndScreen() {
+            saveScoreToHistory();
+            showScreen('end-screen');
+            finalScoreEl.textContent = `${score}/${totalGameQuestions}`;
+        }
+        
+        function saveScoreToHistory() {
+            const history = JSON.parse(localStorage.getItem('cloudQuizHistory_v2')) || [];
+            history.push({
+                level: currentDifficulty,
+                score: score,
+                total: totalGameQuestions,
+                date: new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
+            });
+            localStorage.setItem('cloudQuizHistory_v2', JSON.stringify(history));
+        }
+
+        function showHistoryTab(level) {
+            ['medium', 'hard', 'university'].forEach(id => document.getElementById(`tab-${id}`).classList.remove('active'));
+            document.getElementById(`tab-${level}`).classList.add('active');
+            
+            const history = JSON.parse(localStorage.getItem('cloudQuizHistory_v2')) || [];
+            const filteredHistory = history.filter(entry => entry.level === level);
+            historyLogContainerEl.innerHTML = '';
+
+            if (filteredHistory.length === 0) {
+                historyLogContainerEl.innerHTML = `<p class="text-slate-500 dark:text-slate-400 text-center p-4">Nenhuma rodada jogada neste nível.</p>`;
+                return;
+            }
+
+            filteredHistory.slice().reverse().forEach(entry => {
+                const levelInfo = difficultyMap[entry.level];
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'flex justify-between items-center text-sm p-3 bg-white dark:bg-slate-800/50 rounded-md shadow-sm';
+                entryDiv.innerHTML = `
+                        <div class="font-semibold">
+                            <span class="font-bold ${levelInfo.color}">${levelInfo.name}:</span>
+                            <span class="text-slate-800 dark:text-slate-200"> ${entry.score} de ${entry.total} pontos</span>
+                        </div>
+                        <span class="text-xs text-slate-400 dark:text-slate-500">${entry.date}</span>
+                `;
+                historyLogContainerEl.appendChild(entryDiv);
+            });
+        }
+
+        function clearHistory() {
+            if (confirm('Tem certeza de que deseja apagar todo o seu histórico de estudos? Esta ação não pode ser desfeita.')) {
+                localStorage.removeItem('cloudQuizHistory_v2');
+                const currentTab = document.querySelector('.tab-button.active')?.id.replace('tab-', '') || 'medium';
+                showHistoryTab(currentTab);
+            }
+        }
+        
+        initializePools();
+        showStartScreen();
+    </script>
 </body>
 </html>
